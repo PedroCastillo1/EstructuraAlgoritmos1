@@ -7,3 +7,5 @@ Utilizar archivos para almacenamiento y recuperacion de datos.
 
 
 """
+
+print("hola")

@@ -14,7 +14,7 @@ Sistema de Gestión de Eventos
 1. Descripción General
 
     El sistema de gestión de eventos es una plataforma diseñada para facilitar la organización de eventos en la empresa. Permite a los usuarios internos gestionar reservas, coordinar servicios y calcular presupuestos en función de las opciones seleccionadas.
-
+del eventos[fecha]
 2. Módulos del Sistema
 
     a) Gestión de Salones

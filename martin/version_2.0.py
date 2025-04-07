@@ -19,7 +19,7 @@ def menu ():
 
     while opcion < 1 or opcion > 4: #en caso que el usuario ingrese un numero no valido, vuelve a preguntar
         print("Error opcion no existente ")
-        opcion = int(input("Que desea hacer ? "))
+        opcion = int(input("Que desea hacer? = "))
 
     if opcion == 4: #SI OPCION ES IGUAL A 4 RETORNA FALSO 
         return False    

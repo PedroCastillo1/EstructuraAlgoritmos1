@@ -119,8 +119,8 @@ def buscar_evento(eventos):
 
 eventos = {}
 
-# 📌 Menú interactivo
-while True:
+# 📌 Menú interactivo con recursividad
+def menu(eventos):
     print("\n📅 GESTOR DE EVENTOS 📅")
     print("1️⃣ Agregar evento")
     print("2️⃣ Eliminar evento")
@@ -132,16 +132,27 @@ while True:
 
     if opcion == "1":
         agregar_evento(eventos)
+        menu(eventos)
     elif opcion == "2":
         eliminar_evento(eventos)
+        menu(eventos)
     elif opcion == "3":
         buscar_evento(eventos)
+        menu(eventos)
     elif opcion == "4":
         anio = int(input("📅 Ingresa el año: "))
         mes = int(input("📅 Ingresa el mes (1-12): "))
         mostrar_calendario(eventos, anio, mes)
+        menu(eventos)
     elif opcion == "5":
         print("👋 Saliendo del sistema. ¡Hasta pronto!")
-        break
     else:
         print("⚠️ Opción no válida. Intenta nuevamente.")
+        menu(eventos)
+
+
+# Llamada inicial (asumiendo que ya existe una lista llamada eventos)
+
+
+#PROGRAMA PRINCIPAL
+menu(eventos)

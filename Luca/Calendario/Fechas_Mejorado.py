@@ -74,7 +74,7 @@ def dias_del_mes(anio, mes):
     return dias_en_mes[mes - 1]
 
 # Función para mostrar el calendario anual
-def mostrar_calendario(anio):
+def mostrar_calendario(anio,eventos):
     # Nombres de los meses
     meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
              "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
@@ -182,7 +182,7 @@ def menu(eventos):
         menu(eventos)
     elif opcion == "4":
         anio = int(input("Ingresa el año: "))
-        mostrar_calendario(anio)
+        mostrar_calendario(anio,eventos)
         menu(eventos)
     elif opcion == "5":
         print("Saliendo del sistema. ¡Hasta pronto!")

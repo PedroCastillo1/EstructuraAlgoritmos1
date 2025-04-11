@@ -63,34 +63,30 @@ def mostrarCalendario(año, eventos):
     # Nombres de los meses
     meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
              "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
-    
-    # Recorre cada mes del año
+
     for mes in range(1, 13):
         print("\n" + meses[mes - 1] + " " + str(año))
-        print("Do Lu  Ma  Mi Ju  Vi  Sa")  # Encabezado de días
+        print("Dom\tLun\tMar\tMie\tJue\tVie\tSab")  # Encabezado de días
 
-        primer_dia_semana = diadelasemana(1, mes, año)  # Día de la semana del 1° del mes
-        print("   " * primer_dia_semana, end="")  # Espacios hasta el primer día
+        primer_dia_semana = diadelasemana(1, mes, año)
+        if primer_dia_semana != 0:
+            print("\t" * primer_dia_semana, end="")  # Espacios iniciales
 
-        dia_actual = 1
         dias_mes = diasDelMes(año, mes)
-        dia_semana = primer_dia_semana
-
-        # Imprimir todos los días del mes
-        while dia_actual <= dias_mes:
-            fecha_actual = f"{año:04d}-{mes:02d}-{dia_actual:02d}"  # Formato completo
         
-            # Si la fecha está en eventos, se marca entre corchetes
-            if fecha_actual in eventos:
-                print(f"[{dia_actual:2d}]", end=" ")
-            else:
-                print(f" {dia_actual:2d} ", end=" ")
+        for dia in range(1, dias_mes + 1):
+            fecha_actual = f"{año:04d}-{mes:02d}-{dia:02d}"
+            num_dia_semana = diadelasemana(dia, mes, año)
 
-            dia_semana += 1
-            if dia_semana == 7:
-                print()  # Salto de línea al terminar la semana
-                dia_semana = 0
-            dia_actual += 1
+            # Marca con corchetes si hay evento
+            if fecha_actual in eventos:
+                print(f"[{dia:2d}]", end="\t")
+            else:
+                print(f"{dia:2d}", end="\t")
+
+            # Si es sábado, salta de línea (porque domingo es 0)
+            if num_dia_semana == 6:
+                print()
         print()  # Línea en blanco al final de cada mes
 
 def agregarEventoACalendario(calendario, fecha, eventoAAgregar):
@@ -284,7 +280,4 @@ def programaPrincipal():
             break
     interfaz_salir_programa()          
 
-                   
 programaPrincipal()
-
-

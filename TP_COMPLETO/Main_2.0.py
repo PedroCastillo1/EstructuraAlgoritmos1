@@ -1,6 +1,3 @@
-#####################################################################################################################################################################################
-#####################################################################################################################################################################################
-#####################################################################################################################################################################################
 def esBisiesto(año):
     # Un año es bisiesto si es divisible por 4 y no divisible por 100,
     # a menos que también sea divisible por 400.
@@ -91,23 +88,29 @@ def mostrarCalendario(año, eventos):
             if num_dia_semana == 6:
                 print()
         print()  # Línea en blanco al final de cada mes
-#####################################################################################################################################################################################
-#####################################################################################################################################################################################
-#####################################################################################################################################################################################
+
+
+#################################################################################################################################################
 def agregarEventoACalendario(calendario, fecha, eventoAAgregar):
     if fecha in calendario:
         opcion = input(f"Ya existe un evento en {fecha}. ¿Desea sobrescribirlo? (S/N): ")
         if opcion != "S" and opcion != "s":
             return print(" No se realizó ningún cambio.")
 
-    cliente = eventoAAgregar [0]
-    tipoEvento = eventoAAgregar [1]
-    servicios = eventoAAgregar [2]
-    precio = eventoAAgregar [3]
+    cliente = eventoAAgregar["cliente"]
+    tipoEvento = eventoAAgregar["tipoEvento"]
+    servicios = eventoAAgregar["servicios"]
+    precios = eventoAAgregar["precios"]
 
-    calendario[fecha] = {"cliente": cliente, "tipoDeEvento": tipoEvento, "servicios": servicios, "precio": precio}
+    calendario[fecha] = {
+        "cliente": cliente,
+        "tipoEvento": tipoEvento,
+        "servicios": servicios,
+        "precios": precios
+    }
     print(f"Evento '{cliente}' agregado el {fecha}.")
 
+#################################################################################################################################################
 def eliminarEvento(calendario, fechaAEliminar):
     if not validarFecha(fechaAEliminar):
         return print("Fecha invalida")
@@ -134,26 +137,34 @@ def buscarEvento(calendario, fecha):
     else:
         print(f"No hay eventos el {fecha}.")
 ########################################Funciones Calendario################################################
-def crearEvento(listaEventos,cliente,tipoEvento,servicios,precios):
-    evento = []
-    evento.append(cliente)
-    evento.append(tipoEvento)
-    evento.append(servicios)
-    evento.append(precios)
+def crearEvento(listaEventos, cliente, tipoEvento, servicios, precios):
+    evento = {
+        "cliente": cliente,
+        "tipoEvento": tipoEvento,
+        "servicios": servicios,
+        "precios": precios
+    }
     listaEventos.append(evento)
     return evento
-####################################################Funciones Impresion############################################################################
-# Función para imprimir los evento
-def imprimirEvento(matriz):
+"""
+    ¿Por qué usar un diccionario?
+        Claridad: Es más claro acceder a las propiedades del evento usando claves como evento["cliente"] en lugar de tener que recordar qué índice corresponde a cada atributo.
 
+        Flexibilidad: Si en el futuro decides agregar más información al evento (como una fecha, ubicación o presupuesto), puedes hacerlo fácilmente sin cambiar la estructura.
+
+        Escalabilidad: Si trabajas con muchos eventos, un diccionario es mucho más fácil de manejar y leer que una lista con posiciones que dependen del orden
+"""
+####################################################Funciones Impresion#########################################################################
+# Función para imprimir los evento
+def imprimirEvento(evento):
     # Calcular el total por evento
-    cliente = matriz[0]
-    tipo_evento = matriz[1]
-    servicios = matriz[2]
-    precios = matriz[3]
+    cliente = evento["cliente"]
+    tipo_evento = evento["tipoEvento"]
+    servicios = evento["servicios"]
+    precios = evento["precios"]
     total = 0
     for precio in precios:
-          total += precio
+        total += precio
 
     # Imprimir los eventos ordenados
     print("╔════════════════════════════════════════════════════════════════════╗")
@@ -171,6 +182,52 @@ def imprimirEvento(matriz):
         
     print("└────────────────────────────────┴────────────┘")
     print(f"TOTAL del evento: ${total}")
+
+
+    
+########################################################## AGREGAR EVENTO #############################################################
+
+
+
+def ImprimirEncabezadoEventos():
+    print("\n╔════════════════════════════════════════╗")
+    print("║         LISTA DE TODOS LOS EVENTOS      ║")
+    print("╚════════════════════════════════════════╝")
+
+def ImprimirEvento(nombre_evento, detalles, numero):
+    print(f"\nEvento {numero}: {nombre_evento}")
+    print(f"  Tipo de Evento: {detalles['Tipo']}")
+    print(f"  Fecha: {detalles['Fecha']}")
+    print(f"  Cantidad de Invitados: {detalles['Invitados']}")
+    print(f"  Servicios Contratados: {', '.join(detalles['Servicios']) if detalles['Servicios'] else 'Ninguno'}")
+    print(f"  Presupuesto Total: ${detalles['Presupuesto']}")
+
+def ImprimirMensajeSinEventos():
+    print("\n╔════════════════════════════════════════╗")
+    print("║      NO HAY EVENTOS REGISTRADOS        ║")
+    print("╚════════════════════════════════════════╝\n")
+
+def VerTodosLosEventos(calendario):
+    if not calendario:
+        ImprimirMensajeSinEventos()
+        return  # <- Esto evita que siga ejecutando abajo.
+    
+    ImprimirEncabezadoEventos()
+    numero = 1
+    for fecha, detalles in calendario.items():
+        print(f"\nEvento {numero}:")
+        print(f"  Fecha: {fecha}")
+        print(f"  Cliente: {detalles['cliente']}")
+        print(f"  Tipo de Evento: {detalles['tipoEvento']}")
+        print(f"  Servicios Contratados: {', '.join(detalles['servicios'])}")
+        total = sum(detalles['precios'])
+        print(f"  Presupuesto Total: ${total}")
+        numero += 1
+    print("\n══════════════════════════════════════════\n")
+
+
+
+
 #######################################################Interfaces###################################################################################
 # Interfaces generales
 
@@ -231,37 +288,105 @@ def programaPrincipal():
     interfaz_bienvenida_gestor_eventos()
     opcion = int(input("Seleccione una opcion: "))
     while (0 < opcion < 7):
+        ############################################################################################
         if opcion == 1:
             interfaz_crear_evento()
-            cliente = input("Ingrese su nombre: ")
-            tipoEvento = input("Ingrese el tipo de evento: ")
-            serviciosElegidos = []
+            cliente = input("Nombre del cliente: ")
+            tipoEvento = input("Tipo de evento (Ej: Casamiento, Cumpleaños): ")
+            
+            servicios_disponibles = {
+                "Catering": 200000,
+                "DJ": 80000,
+                "Decoración": 60000,
+                "Fotografía": 45000,
+                "Pantalla gigante": 45000,
+                "Sonido": 30000,
+                "Cant_personas (50)": 2500,
+                "Cant_personas (100)": 5000,
+                "Cant_personas (150)": 7500
+            }
+            
+            servicios = []
             precios = []
-            #imprimirServicios(servicios)
-            opcionServ = int(input("Elija por favor un servicio a agregar, si no quiere agregar servicios presiona -1: "))
-            while opcionServ != -1:
-                if ( 0 <= opcionServ < (len(servicios))):
-                    #if verificarServiciosElegidos(servicios, servicios[opcionServ]) ToDo == False:
-                        serviciosElegidos.append(servicios [opcionServ][0])
-                        precios.append(servicios [opcionServ] [1])
-                    #else
-                        print("Servicio ya esta agregado")
-                    #imprimirServicios(servicios) ToDo
-                        opcionServ = int(input("Elija por favor un servicio a agregar, si no quiere agregar servicios presiona -1: "))
+            seleccionados = []   
+            
+            while True:
+                print("\n🎛 Servicios disponibles para seleccionar:")
+                opciones = []
+                i = 1
+                for servicio, precio in servicios_disponibles.items():
+                    if servicio not in seleccionados:
+                        print(f"{i}. {servicio} - ${precio}")
+                        opciones.append(servicio)
+                        i += 1
+
+                opcion_eliminar = i
+                opcion_finalizar = i + 1
+
+                print(f"{opcion_eliminar}. ❌ Eliminar un servicio elegido")
+                print(f"{opcion_finalizar}. ✅ Finalizar selección de servicios")
+
+                eleccion = input("Elegí una opción: ")
+
+                if eleccion.isdigit():
+                    eleccion = int(eleccion)
+                    if 1 <= eleccion <= len(opciones):
+                        servicio_elegido = opciones[eleccion - 1]
+                        if servicio_elegido not in seleccionados:  # Verificar que no se haya seleccionado previamente
+                            seleccionados.append(servicio_elegido)
+                            servicios.append(servicio_elegido)
+                            precios.append(servicios_disponibles[servicio_elegido])
+                            print(f"✅ '{servicio_elegido}' agregado.")
+                        else:
+                            print("⚠️ Este servicio ya ha sido seleccionado.")
+                    elif eleccion == opcion_eliminar:
+                        if not servicios:
+                            print("⚠️ Aún no hay servicios que eliminar.")
+                        else:
+                            print("\n🗑 Servicios ya elegidos:")
+                            for idx, s in enumerate(servicios):
+                                print(f"{idx + 1}. {s}")
+                            quitar = input("Número del servicio a eliminar: ")
+                            if quitar.isdigit():
+                                quitar = int(quitar)
+                                if 1 <= quitar <= len(servicios):
+                                    eliminado = servicios.pop(quitar - 1)
+                                    precios.pop(quitar - 1)
+                                    seleccionados.remove(eliminado)
+                                    print(f"❌ '{eliminado}' eliminado.")
+                                else:
+                                    print("Número inválido.")
+                            else:
+                                print("Entrada inválida.")
+                    elif eleccion == opcion_finalizar:
+                        if not servicios:
+                            print("⚠️ No podés finalizar sin al menos un servicio.")
+                        else:
+                            print("✅ Finalizando selección...")
+                            break  # Aquí se finaliza la selección si hay al menos un servicio.
+                    else:
+                        print("❌ Opción no válida.")
                 else:
-                        opcionServ = int(input("Numero no valido por favor elija otro, si no quiere agregar servicios presiona -1: "))
-            evento = crearEvento(listaEventos, cliente, tipoEvento,serviciosElegidos,precios)
+                    print("❌ Entrada inválida.")
+
+            # Ahora utilizamos servicios y precios, no serviciosElegidos
+            evento = crearEvento(listaEventos, cliente, tipoEvento, servicios, precios)
             imprimirEvento(evento)
+            
             fecha = input("Ingrese la fecha del evento en este formato YYYY-MM-DD: ")
             while validarFecha(fecha) == False:
                 fecha = input("Fecha invalida ingrese una fecha valida en este formato YYYY-MM-DD: ")
             agregarEventoACalendario(calendario, fecha, evento)
             interfaz_bienvenida_gestor_eventos()
-            opcion = int(input("Seleccione una opcion: "))
+            opcion = int(input("Seleccione una opción: "))
+
+            
+            
+        ############################################################################################
+            
         if(opcion == 2):
             interfaz_ver_evento()
-            #VerTodosLosEventos LUCA
-            break
+            VerTodosLosEventos(calendario)
         if(opcion == 3):
             interfaz_eliminar_evento()
             fechaAEliminar = input("Ingresa la fecha del evento a eliminar en YYYY-MM-DD: ")
@@ -287,3 +412,6 @@ def programaPrincipal():
     interfaz_salir_programa()          
 
 programaPrincipal()
+
+
+

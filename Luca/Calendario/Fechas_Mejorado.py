@@ -25,8 +25,6 @@ def diadelasemana(dia, mes, anio):
     return diassem
 
 
-
-
 # Función para validar una fecha ingresada
 def validar_fecha(fecha):
     """

@@ -224,6 +224,7 @@ def VerTodosLosEventos(calendario):
         print(f"  Presupuesto Total: ${total}")
         numero += 1
     print("\n══════════════════════════════════════════\n")
+    #Bucle infinito corregir
 
 
 
@@ -309,7 +310,7 @@ def programaPrincipal():
             servicios = []
             precios = []
             seleccionados = []   
-            
+            #Esto a que reever esta lindo pero es mas ilegal que pablo escobar
             while True:
                 print("\n🎛 Servicios disponibles para seleccionar:")
                 opciones = []

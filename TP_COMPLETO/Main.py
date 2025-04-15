@@ -128,6 +128,13 @@ def buscarEvento(calendario, fecha):
         return imprimirEvento(evento)
     else:
         print(f"No hay eventos el {fecha}.")
+
+def verificarServiciosElegidos(serviciosElegidos, servicioAAgregar):
+    # Verifica si ese nombre ya está en la lista de servicios elegidos
+    resultado = True
+    if servicioAAgregar in serviciosElegidos:
+        resultado = False
+    return resultado
 ########################################Funciones Calendario################################################
 def crearEvento(listaEventos,cliente,tipoEvento,servicios,precios):
     evento = []
@@ -139,13 +146,13 @@ def crearEvento(listaEventos,cliente,tipoEvento,servicios,precios):
     return evento
 ####################################################Funciones Impresion############################################################################
 # Función para imprimir los evento
-def imprimirEvento(matriz):
+def imprimirEvento(evento):
 
     # Calcular el total por evento
-    cliente = matriz[0]
-    tipo_evento = matriz[1]
-    servicios = matriz[2]
-    precios = matriz[3]
+    cliente = evento[0]
+    tipo_evento = evento[1]
+    servicios = evento[2]
+    precios = evento[3]
     total = 0
     for precio in precios:
           total += precio
@@ -166,6 +173,17 @@ def imprimirEvento(matriz):
         
     print("└────────────────────────────────┴────────────┘")
     print(f"TOTAL del evento: ${total}")
+
+def imprimirServicios(servicios):
+    print("\n+--------------------------+-------------+")
+    print("|        SERVICIO         |   PRECIO    |")
+    print("+--------------------------+-------------+")
+    for i in range(len(servicios)):
+        nombre = servicios[i][0]
+        precio = servicios[i][1]
+        print(f"| {i}: {nombre:<22} | ${precio:<9} |")
+    print("+--------------------------+-------------+")
+
 #######################################################Interfaces###################################################################################
 # Interfaces generales
 
@@ -230,21 +248,23 @@ def programaPrincipal():
             interfaz_crear_evento()
             cliente = input("Ingrese su nombre: ")
             tipoEvento = input("Ingrese el tipo de evento: ")
+            cantPersonas = int(input("Ingrese la cantidad de personas que vendran al evento: "))
             serviciosElegidos = []
             precios = []
-            #imprimirServicios(servicios) lucia
+            serviciosElegidos.append(f"CantPersonas({cantPersonas})")
+            precios.append(cantPersonas*1000)
+            imprimirServicios(servicios)
             opcionServ = int(input("Elija por favor un servicio a agregar, si no quiere agregar servicios presiona -1: "))
             while opcionServ != -1:
-                if ( 0 <= opcionServ < (len(servicios))):
-                    #if verificarServiciosElegidos(serviciosElegidos, servicios[opcionServ]) ToDo == False: lucia
-                        serviciosElegidos.append(servicios [opcionServ][0])
-                        precios.append(servicios [opcionServ] [1])
-                    #else
-                        print("Servicio ya esta agregado")
-                    #imprimirServicios(servicios) ToDo
-                        opcionServ = int(input("Elija por favor un servicio a agregar, si no quiere agregar servicios presiona -1: "))
+                if (0 <= opcionServ < len(servicios)):
+                    if verificarServiciosElegidos(serviciosElegidos, servicios[opcionServ][0]) == True:
+                        serviciosElegidos.append(servicios[opcionServ][0])
+                        precios.append(servicios[opcionServ][1])
+                    else:
+                        print("Este servicio ya esta seleccionado!")
+                    opcionServ = int(input("Elija por favor un servicio a agregar, si no quiere agregar servicios presiona -1: "))
                 else:
-                        opcionServ = int(input("Numero no valido por favor elija otro, si no quiere agregar servicios presiona -1: "))
+                    opcionServ = int(input("Numero no valido por favor elija otro, si no quiere agregar servicios presiona -1: "))
             evento = crearEvento(listaEventos, cliente, tipoEvento,serviciosElegidos,precios)
             imprimirEvento(evento)
             fecha = input("Ingrese la fecha del evento en este formato YYYY-MM-DD: ")

@@ -184,6 +184,56 @@ def imprimirServicios(servicios):
         print(f"| {i}: {nombre:<22} | ${precio:<9} |")
     print("+--------------------------+-------------+")
 
+def imprimir_eventos(diccionario):
+    total_general = 0
+    lista_eventos = []
+
+    # Crear lista auxiliar con totales
+    for fecha, datos in diccionario.items():
+        total = 0
+        for precio in datos["precio"]:
+            total += precio
+        lista_eventos.append({
+            "fecha": fecha,
+            "cliente": datos["cliente"],
+            "tipoDeEvento": datos["tipoDeEvento"],
+            "servicios": datos["servicios"],
+            "precio": datos["precio"],
+            "total": total
+        })
+
+    # Ordenar eventos por total (mayor a menor)
+    for i in range(len(lista_eventos)):
+        for j in range(i + 1, len(lista_eventos)):
+            if lista_eventos[j]["total"] > lista_eventos[i]["total"]:
+                aux = lista_eventos[i]
+                lista_eventos[i] = lista_eventos[j]
+                lista_eventos[j] = aux
+
+    # Imprimir eventos
+    print("╔════════════════════════════════════════════════════════════════════╗")
+    print("║                  DETALLE DE EVENTOS CON FECHAS                     ║")
+    print("╚════════════════════════════════════════════════════════════════════╝")
+    
+    for e in lista_eventos:
+        print(f"\nCliente: {e['cliente']}")
+        print(f"Tipo de Evento: {e['tipoDeEvento']}")
+        print(f"Fecha: {e['fecha']}")
+        print("┌────────────────────────────────┬────────────┐")
+        print("│          Servicio              │   Precio   │")
+        print("├────────────────────────────────┼────────────┤")
+        for i in range(len(e["servicios"])):
+            print(f"│ {e['servicios'][i]:<30} │ ${e['precio'][i]:<10}│")
+        print("└────────────────────────────────┴────────────┘")
+        print(f"TOTAL del evento: ${e['total']}")
+        total_general += e["total"]
+
+    print("\n════════════════════════════════════════════════════════════════════")
+    print(f"TOTAL GENERAL INGRESADO POR TODOS LOS EVENTOS: ${total_general}")
+    print("════════════════════════════════════════════════════════════════════")
+
+# Llamada a la función
+
 #######################################################Interfaces###################################################################################
 # Interfaces generales
 
@@ -242,6 +292,7 @@ def programaPrincipal():
     calendario = {}
     servicios = [["Catering Caro", 200000], ["Catering Barato", 75000], ["Dj", 50000], ["Fotografo", 20000]]
     interfaz_bienvenida_gestor_eventos()
+    
     opcion = int(input("Seleccione una opcion: "))
     while (0 < opcion < 7):
         if opcion == 1:
@@ -273,28 +324,34 @@ def programaPrincipal():
             agregarEventoACalendario(calendario, fecha, evento)
             interfaz_bienvenida_gestor_eventos()
             opcion = int(input("Seleccione una opcion: "))
+        
         if(opcion == 2):
             interfaz_ver_evento()
-            #VerTodosLosEventos LUCA
-            break
+            imprimir_eventos(calendario)
+            interfaz_bienvenida_gestor_eventos()
+            opcion = int(input("Seleccione una opcion: "))
+        
         if(opcion == 3):
             interfaz_eliminar_evento()
             fechaAEliminar = input("Ingresa la fecha del evento a eliminar en YYYY-MM-DD: ")
             eliminarEvento(calendario,fechaAEliminar)
             interfaz_bienvenida_gestor_eventos()
             opcion = int(input("Seleccione una opcion: "))
+        
         if(opcion == 4):
             interfaz_mostrar_calendario()
             año = int(input("Ingrese el año a visualizar: "))
             mostrarCalendario(año,calendario)
             interfaz_bienvenida_gestor_eventos()
             opcion = int(input("Seleccione una opcion: "))
+        
         if(opcion == 5):
             interfaz_buscar_evento()
             fechaABuscar = input("Ingresa la fecha del evento a buscar en YYYY-MM-DD: ")
             buscarEvento(calendario, fechaABuscar)
             interfaz_bienvenida_gestor_eventos()
             opcion = int(input("Seleccione una opcion: "))
+        
         if(opcion == 6):
             interfaz_salir_gestor_eventos()
             opcion = -1

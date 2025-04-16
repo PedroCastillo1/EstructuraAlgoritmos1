@@ -317,50 +317,47 @@ def opcionCrearEvento(calendario,servicios,listaEventos):
 
 
 #Programa Principal
-def programaPrincipal():
-    listaEventos = []
-    calendario = {}
-    servicios = [["Catering Caro", 200000], ["Catering Barato", 75000], ["Dj", 50000], ["Fotografo", 20000]]
-    interfaz_bienvenida_gestor_eventos()
-    
-    opcion = int(input("Seleccione una opcion: "))
-    while (0 < opcion < 7):
-        if opcion == 1:
-            opcionCrearEvento(calendario,servicios,listaEventos)
-            interfaz_bienvenida_gestor_eventos()
-            opcion = int(input("Seleccione una opcion: "))
-        
-        if(opcion == 2):
-            interfaz_ver_evento()
-            imprimir_eventos(calendario)
-            interfaz_bienvenida_gestor_eventos()
-            opcion = int(input("Seleccione una opcion: "))
-        
-        if(opcion == 3):
-            interfaz_eliminar_evento()
-            fechaAEliminar = input("Ingresa la fecha del evento a eliminar en YYYY-MM-DD: ")
-            eliminarEvento(calendario,fechaAEliminar)
-            interfaz_bienvenida_gestor_eventos()
-            opcion = int(input("Seleccione una opcion: "))
-        
-        if(opcion == 4):
-            interfaz_mostrar_calendario()
-            año = int(input("Ingrese el año a visualizar: "))
-            mostrarCalendario(año,calendario)
-            interfaz_bienvenida_gestor_eventos()
-            opcion = int(input("Seleccione una opcion: "))
-        
-        if(opcion == 5):
-            interfaz_buscar_evento()
-            fechaABuscar = input("Ingresa la fecha del evento a buscar en YYYY-MM-DD: ")
-            buscarEvento(calendario, fechaABuscar)
-            interfaz_bienvenida_gestor_eventos()
-            opcion = int(input("Seleccione una opcion: "))
-        
-        if(opcion == 6):
-            interfaz_salir_gestor_eventos()
-            opcion = -1
-            break
-    interfaz_salir_programa()          
+listaEventos = []
+calendario = {}
+servicios = [["Catering Caro", 200000], ["Catering Barato", 75000], ["Dj", 50000], ["Fotografo", 20000]]
+interfaz_bienvenida_gestor_eventos()
 
-programaPrincipal()
+opcion = int(input("Seleccione una opcion: "))
+while (0 < opcion < 7):
+    if opcion == 1:
+        opcionCrearEvento(calendario,servicios,listaEventos)
+        interfaz_bienvenida_gestor_eventos()
+        opcion = int(input("Seleccione una opcion: "))
+    
+    if(opcion == 2):
+        interfaz_ver_evento()
+        imprimir_eventos(calendario)
+        interfaz_bienvenida_gestor_eventos()
+        opcion = int(input("Seleccione una opcion: "))
+    
+    if(opcion == 3):
+        interfaz_eliminar_evento()
+        fechaAEliminar = input("Ingresa la fecha del evento a eliminar en YYYY-MM-DD: ")
+        eliminarEvento(calendario,fechaAEliminar)
+        interfaz_bienvenida_gestor_eventos()
+        opcion = int(input("Seleccione una opcion: "))
+    
+    if(opcion == 4):
+        interfaz_mostrar_calendario()
+        año = int(input("Ingrese el año a visualizar: "))
+        mostrarCalendario(año,calendario)
+        interfaz_bienvenida_gestor_eventos()
+        opcion = int(input("Seleccione una opcion: "))
+    
+    if(opcion == 5):
+        interfaz_buscar_evento()
+        fechaABuscar = input("Ingresa la fecha del evento a buscar en YYYY-MM-DD: ")
+        buscarEvento(calendario, fechaABuscar)
+        interfaz_bienvenida_gestor_eventos()
+        opcion = int(input("Seleccione una opcion: "))
+    
+    if(opcion == 6):
+        interfaz_salir_gestor_eventos()
+        opcion = -1
+        break
+interfaz_salir_programa()          

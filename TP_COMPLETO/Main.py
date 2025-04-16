@@ -109,7 +109,7 @@ def eliminarEvento(calendario, fechaAEliminar):
 
     if fechaAEliminar in calendario:
         print(f"Eliminando '{calendario[fechaAEliminar]['cliente']}' el {fechaAEliminar}.")
-        del calendario[fechaAEliminar]
+        calendario[fechaAEliminar].pop()
     else:
         print(f"No hay eventos el {fechaAEliminar}.")
 
@@ -286,6 +286,36 @@ def interfaz_salir_gestor_eventos():
     print("|       Saliendo del gestor de eventos...          |")
     print("+--------------------------------------------------+")
 
+
+def opcionCrearEvento(calendario,servicios,listaEventos):
+    interfaz_crear_evento()
+    cliente = input("Ingrese su nombre: ")
+    tipoEvento = input("Ingrese el tipo de evento: ")
+    cantPersonas = int(input("Ingrese la cantidad de personas que vendran al evento: "))
+    serviciosElegidos = []
+    precios = []
+    serviciosElegidos.append(f"CantPersonas({cantPersonas})")
+    precios.append(cantPersonas*1000)
+    imprimirServicios(servicios)
+    opcionServ = int(input("Elija por favor un servicio a agregar, si no quiere agregar servicios presiona -1: "))
+    while opcionServ != -1:
+        if (0 <= opcionServ < len(servicios)):
+            if verificarServiciosElegidos(serviciosElegidos, servicios[opcionServ][0]) == True:
+                serviciosElegidos.append(servicios[opcionServ][0])
+                precios.append(servicios[opcionServ][1])
+            else:
+                print("Este servicio ya esta seleccionado!")
+                opcionServ = int(input("Elija por favor un servicio a agregar, si no quiere agregar servicios presiona -1: "))
+        else:
+            opcionServ = int(input("Numero no valido por favor elija otro, si no quiere agregar servicios presiona -1: "))
+    evento = crearEvento(listaEventos, cliente, tipoEvento,serviciosElegidos,precios)
+    imprimirEvento(evento)
+    fecha = input("Ingrese la fecha del evento en este formato YYYY-MM-DD: ")
+    while validarFecha(fecha) == False:
+        fecha = input("Fecha invalida ingrese una fecha valida en este formato YYYY-MM-DD: ")
+    agregarEventoACalendario(calendario, fecha, evento)
+
+
 #Programa Principal
 def programaPrincipal():
     listaEventos = []
@@ -296,32 +326,7 @@ def programaPrincipal():
     opcion = int(input("Seleccione una opcion: "))
     while (0 < opcion < 7):
         if opcion == 1:
-            interfaz_crear_evento()
-            cliente = input("Ingrese su nombre: ")
-            tipoEvento = input("Ingrese el tipo de evento: ")
-            cantPersonas = int(input("Ingrese la cantidad de personas que vendran al evento: "))
-            serviciosElegidos = []
-            precios = []
-            serviciosElegidos.append(f"CantPersonas({cantPersonas})")
-            precios.append(cantPersonas*1000)
-            imprimirServicios(servicios)
-            opcionServ = int(input("Elija por favor un servicio a agregar, si no quiere agregar servicios presiona -1: "))
-            while opcionServ != -1:
-                if (0 <= opcionServ < len(servicios)):
-                    if verificarServiciosElegidos(serviciosElegidos, servicios[opcionServ][0]) == True:
-                        serviciosElegidos.append(servicios[opcionServ][0])
-                        precios.append(servicios[opcionServ][1])
-                    else:
-                        print("Este servicio ya esta seleccionado!")
-                    opcionServ = int(input("Elija por favor un servicio a agregar, si no quiere agregar servicios presiona -1: "))
-                else:
-                    opcionServ = int(input("Numero no valido por favor elija otro, si no quiere agregar servicios presiona -1: "))
-            evento = crearEvento(listaEventos, cliente, tipoEvento,serviciosElegidos,precios)
-            imprimirEvento(evento)
-            fecha = input("Ingrese la fecha del evento en este formato YYYY-MM-DD: ")
-            while validarFecha(fecha) == False:
-                fecha = input("Fecha invalida ingrese una fecha valida en este formato YYYY-MM-DD: ")
-            agregarEventoACalendario(calendario, fecha, evento)
+            opcionCrearEvento(calendario,servicios,listaEventos)
             interfaz_bienvenida_gestor_eventos()
             opcion = int(input("Seleccione una opcion: "))
         

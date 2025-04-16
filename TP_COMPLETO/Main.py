@@ -1,15 +1,12 @@
 def esBisiesto(año):
-    """
-    	Un año es bisiesto si es divisible por 4 y no divisible por 100, a menos que también sea divisible por 400.
-    """
+    # Un año es bisiesto si es divisible por 4 y no divisible por 100,
+    # a menos que también sea divisible por 400.
     if año % 4 == 0 and (año % 100 != 0 or año % 400 == 0):
         return True
     return False
 
+# Función que devuelve el día de la semana usando el algoritmo de Zeller
 def diadelasemana(dia, mes, año):
-    """
-        Función que devuelve el día de la semana usando el algoritmo de Zeller
-    """
     # Para enero y febrero, se consideran como meses 13 y 14 del año anterior
     if mes < 3:
         mes += 10
@@ -26,10 +23,8 @@ def diadelasemana(dia, mes, año):
         diassem += 7
     return diassem
 
+# Función para validar una fecha ingresada
 def validarFecha(fecha):
-    """
-        Función para validar una fecha ingresada
-    """
     partes = fecha.split("-") #  "2025-04-10" -----> ["2025", "04", "10"]
     if len(partes) != 3: # Si el usuario ingresa mal la fecha (falta un parametro) retorna FALSE
         return False
@@ -58,22 +53,18 @@ def validarFecha(fecha):
     return True
 
 def diasDelMes(año, mes):
-    """
-        Lista de días por mes. Febrero depende de si es bisiesto.
-    """
+    # Lista de días por mes. Febrero depende de si es bisiesto.
     dias_en_mes = [31, 29 if esBisiesto(año) else 28, 31, 30, 31, 30,
                    31, 31, 30, 31, 30, 31]
     return dias_en_mes[mes - 1]
 
+# Función para mostrar el calendario anual
 def mostrarCalendario(año, eventos):
-    """
-        Función para mostrar el calendario anual
-    """
-    # Nombres de los meses en una lista
+    # Nombres de los meses
     meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
              "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 
-    for mes in range(1, 13): # recorre los meses (1 hasta 12)
+    for mes in range(1, 13):
         print("\n" + meses[mes - 1] + " " + str(año))
         print("Dom\tLun\tMar\tMie\tJue\tVie\tSab")  # Encabezado de días
 
@@ -99,47 +90,26 @@ def mostrarCalendario(año, eventos):
         print()  # Línea en blanco al final de cada mes
 
 def agregarEventoACalendario(calendario, fecha, eventoAAgregar):
-    """
-        Verifica si la dicha fecha esta dentro del calendario 
-            - si esta pregunta de sobrescribirlo si/no
-                -No : No realiza ningin cambio
-                -Si: agrega el evento con cada parametro ( Cliente - TipoEvento - Servicios - Precio)
-        imprime un mensaje de que se cumplio la carga
-    """
-
-    if fecha in calendario: # si la fecha ingresada se encuentra en el calendario
-        #Ingresa por teclado la opcion a elegir
-
-        # AGREGAR LA FUNCION .LOWER!!!!!!!!!! (PARA SACAR EL IF DE ABAJO POR TEMAS DE MAYUS/MINUS)
+    if fecha in calendario:
         opcion = input(f"Ya existe un evento en {fecha}. ¿Desea sobrescribirlo? (S/N): ")
         if opcion != "S" and opcion != "s":
             return print(" No se realizó ningún cambio.")
 
-    # Agregamos cada parametro del evento a cada posicion de la lista
     cliente = eventoAAgregar [0]
     tipoEvento = eventoAAgregar [1]
     servicios = eventoAAgregar [2]
     precio = eventoAAgregar [3]
 
-    
     calendario[fecha] = {"cliente": cliente, "tipoDeEvento": tipoEvento, "servicios": servicios, "precio": precio}
     print(f"Evento '{cliente}' agregado el {fecha}.")
 
 def eliminarEvento(calendario, fechaAEliminar):
-    """ 
-        Elimina eventos
-            - Verifica que la fecha pasada por parametro sea valida
-            - verifica que dicha fecha este dentro del calendario
-                - sino informa y no realiza dicha funcion
-            
-    
-    """
-    # Sino se cumple la funcion de validarFecha informa que se ingreso una fecha invalida
     if not validarFecha(fechaAEliminar):
         return print("Fecha invalida")
-    # Si la fecha a eliminar esta dentro del calendario, realiza la eliminacion de la fecha 
+
     if fechaAEliminar in calendario:
         print(f"Eliminando '{calendario[fechaAEliminar]['cliente']}' el {fechaAEliminar}.")
+<<<<<<< HEAD
 <<<<<<< HEAD
 
         #No se que realiza esta linea de codigo (ver en grupo)
@@ -149,25 +119,14 @@ def eliminarEvento(calendario, fechaAEliminar):
 =======
         calendario[fechaAEliminar].pop()
 >>>>>>> 16da70c89e3009652a326c69eedd07a6ee3b75d9
+=======
+        del calendario[fechaAEliminar]
+>>>>>>> parent of 2510231 (comente algunas cosa)
     else:
         print(f"No hay eventos el {fechaAEliminar}.")
 
-
+# Función para buscar un evento
 def buscarEvento(calendario, fecha):
-    """
-        Funcion para buscar un evento
-            - validamos que la fecha sea ingresada correctamente
-            - Validamos que dicha fecha se encuentre dentro del calendario
-            
-            ????
-            - agrega cada parametro del evento encontrado a la lista Evento []
-            - sino informa que no hay dicho evento en calendario
-
-
-            HAY QUE MODIFICAR ESTE CODIGO PORQUE REALIZA MUCHAS COSAS EN VEZ DE UNA SOLA COSA ESPECIFICA <3
-
-    
-    """
     if not validarFecha(fecha):
         return print("Fecha invalida")
 
@@ -183,38 +142,24 @@ def buscarEvento(calendario, fecha):
         print(f"No hay eventos el {fecha}.")
 
 def verificarServiciosElegidos(serviciosElegidos, servicioAAgregar):
-    """
-        Verifica si es nombre ya esta en la lista de servicios elegidos
-
-    """
-    #creo una variable booleana
+    # Verifica si ese nombre ya está en la lista de servicios elegidos
     resultado = True
-    # Si Servicio a agregar se encuentra en servicios elegidos
     if servicioAAgregar in serviciosElegidos:
-        # Se actualiza la variable a false --> significa que ya esta como servicio elegido
         resultado = False
-    return resultado # Retorna si se encuentra o no se encuentra
+    return resultado
 ########################################Funciones Calendario################################################
 def crearEvento(listaEventos,cliente,tipoEvento,servicios,precios):
-    """
-        Crea un evento
-            - genera una lista vacia
-            - agrega cada parametro enviado a la lista 
-            - Retorna la lista cargada
-    """
-    evento = [] # Crea una lista vacia
-    # Agrega cada parametro a la lista
+    evento = []
     evento.append(cliente)
     evento.append(tipoEvento)
     evento.append(servicios)
     evento.append(precios)
     listaEventos.append(evento)
     return evento
-####################################################Funciones Impresion######################################
+####################################################Funciones Impresion############################################################################
+# Función para imprimir los evento
 def imprimirEvento(evento):
-    """
-        Función para imprimir los evento
-    """
+
     # Calcular el total por evento
     cliente = evento[0]
     tipo_evento = evento[1]

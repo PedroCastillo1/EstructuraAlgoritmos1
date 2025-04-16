@@ -109,19 +109,7 @@ def eliminarEvento(calendario, fechaAEliminar):
 
     if fechaAEliminar in calendario:
         print(f"Eliminando '{calendario[fechaAEliminar]['cliente']}' el {fechaAEliminar}.")
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-        #No se que realiza esta linea de codigo (ver en grupo)
         del calendario[fechaAEliminar]
-
-    #Si no esta dentro del calendario informa que no existe tal evento
-=======
-        calendario[fechaAEliminar].pop()
->>>>>>> 16da70c89e3009652a326c69eedd07a6ee3b75d9
-=======
-        del calendario[fechaAEliminar]
->>>>>>> parent of 2510231 (comente algunas cosa)
     else:
         print(f"No hay eventos el {fechaAEliminar}.")
 

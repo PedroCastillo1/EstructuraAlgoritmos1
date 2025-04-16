@@ -140,11 +140,15 @@ def eliminarEvento(calendario, fechaAEliminar):
     # Si la fecha a eliminar esta dentro del calendario, realiza la eliminacion de la fecha 
     if fechaAEliminar in calendario:
         print(f"Eliminando '{calendario[fechaAEliminar]['cliente']}' el {fechaAEliminar}.")
+<<<<<<< HEAD
 
         #No se que realiza esta linea de codigo (ver en grupo)
         del calendario[fechaAEliminar]
 
     #Si no esta dentro del calendario informa que no existe tal evento
+=======
+        calendario[fechaAEliminar].pop()
+>>>>>>> 16da70c89e3009652a326c69eedd07a6ee3b75d9
     else:
         print(f"No hay eventos el {fechaAEliminar}.")
 
@@ -349,76 +353,78 @@ def interfaz_salir_gestor_eventos():
     print("|       Saliendo del gestor de eventos...          |")
     print("+--------------------------------------------------+")
 
-#Programa Principal
-def programaPrincipal():
-    listaEventos = []
-    calendario = {}
-    servicios = [["Catering Caro", 200000], ["Catering Barato", 75000], ["Dj", 50000], ["Fotografo", 20000]]
-    interfaz_bienvenida_gestor_eventos()
-    
-    opcion = int(input("Seleccione una opcion: "))
-    while (0 < opcion < 7):
-        if opcion == 1:
-            interfaz_crear_evento()
-            cliente = input("Ingrese su nombre: ")
-            tipoEvento = input("Ingrese el tipo de evento: ")
-            cantPersonas = int(input("Ingrese la cantidad de personas que vendran al evento: "))
-            serviciosElegidos = []
-            precios = []
-            serviciosElegidos.append(f"CantPersonas({cantPersonas})")
-            precios.append(cantPersonas*1000)
-            imprimirServicios(servicios)
-            opcionServ = int(input("Elija por favor un servicio a agregar, si no quiere agregar servicios presiona -1: "))
-            while opcionServ != -1:
-                if (0 <= opcionServ < len(servicios)):
-                    if verificarServiciosElegidos(serviciosElegidos, servicios[opcionServ][0]) == True:
-                        serviciosElegidos.append(servicios[opcionServ][0])
-                        precios.append(servicios[opcionServ][1])
-                    else:
-                        print("Este servicio ya esta seleccionado!")
-                    opcionServ = int(input("Elija por favor un servicio a agregar, si no quiere agregar servicios presiona -1: "))
-                else:
-                    opcionServ = int(input("Numero no valido por favor elija otro, si no quiere agregar servicios presiona -1: "))
-            evento = crearEvento(listaEventos, cliente, tipoEvento,serviciosElegidos,precios)
-            imprimirEvento(evento)
-            fecha = input("Ingrese la fecha del evento en este formato YYYY-MM-DD: ")
-            while validarFecha(fecha) == False:
-                fecha = input("Fecha invalida ingrese una fecha valida en este formato YYYY-MM-DD: ")
-            agregarEventoACalendario(calendario, fecha, evento)
-            interfaz_bienvenida_gestor_eventos()
-            opcion = int(input("Seleccione una opcion: "))
-        
-        if(opcion == 2):
-            interfaz_ver_evento()
-            imprimir_eventos(calendario)
-            interfaz_bienvenida_gestor_eventos()
-            opcion = int(input("Seleccione una opcion: "))
-        
-        if(opcion == 3):
-            interfaz_eliminar_evento()
-            fechaAEliminar = input("Ingresa la fecha del evento a eliminar en YYYY-MM-DD: ")
-            eliminarEvento(calendario,fechaAEliminar)
-            interfaz_bienvenida_gestor_eventos()
-            opcion = int(input("Seleccione una opcion: "))
-        
-        if(opcion == 4):
-            interfaz_mostrar_calendario()
-            año = int(input("Ingrese el año a visualizar: "))
-            mostrarCalendario(año,calendario)
-            interfaz_bienvenida_gestor_eventos()
-            opcion = int(input("Seleccione una opcion: "))
-        
-        if(opcion == 5):
-            interfaz_buscar_evento()
-            fechaABuscar = input("Ingresa la fecha del evento a buscar en YYYY-MM-DD: ")
-            buscarEvento(calendario, fechaABuscar)
-            interfaz_bienvenida_gestor_eventos()
-            opcion = int(input("Seleccione una opcion: "))
-        
-        if(opcion == 6):
-            interfaz_salir_gestor_eventos()
-            opcion = -1
-            break
-    interfaz_salir_programa()          
 
-programaPrincipal()
+def opcionCrearEvento(calendario,servicios,listaEventos):
+    interfaz_crear_evento()
+    cliente = input("Ingrese su nombre: ")
+    tipoEvento = input("Ingrese el tipo de evento: ")
+    cantPersonas = int(input("Ingrese la cantidad de personas que vendran al evento: "))
+    serviciosElegidos = []
+    precios = []
+    serviciosElegidos.append(f"CantPersonas({cantPersonas})")
+    precios.append(cantPersonas*1000)
+    imprimirServicios(servicios)
+    opcionServ = int(input("Elija por favor un servicio a agregar, si no quiere agregar servicios presiona -1: "))
+    while opcionServ != -1:
+        if (0 <= opcionServ < len(servicios)):
+            if verificarServiciosElegidos(serviciosElegidos, servicios[opcionServ][0]) == True:
+                serviciosElegidos.append(servicios[opcionServ][0])
+                precios.append(servicios[opcionServ][1])
+            else:
+                print("Este servicio ya esta seleccionado!")
+                opcionServ = int(input("Elija por favor un servicio a agregar, si no quiere agregar servicios presiona -1: "))
+        else:
+            opcionServ = int(input("Numero no valido por favor elija otro, si no quiere agregar servicios presiona -1: "))
+    evento = crearEvento(listaEventos, cliente, tipoEvento,serviciosElegidos,precios)
+    imprimirEvento(evento)
+    fecha = input("Ingrese la fecha del evento en este formato YYYY-MM-DD: ")
+    while validarFecha(fecha) == False:
+        fecha = input("Fecha invalida ingrese una fecha valida en este formato YYYY-MM-DD: ")
+    agregarEventoACalendario(calendario, fecha, evento)
+
+
+#Programa Principal
+listaEventos = []
+calendario = {}
+servicios = [["Catering Caro", 200000], ["Catering Barato", 75000], ["Dj", 50000], ["Fotografo", 20000]]
+interfaz_bienvenida_gestor_eventos()
+
+opcion = int(input("Seleccione una opcion: "))
+while (0 < opcion < 7):
+    if opcion == 1:
+        opcionCrearEvento(calendario,servicios,listaEventos)
+        interfaz_bienvenida_gestor_eventos()
+        opcion = int(input("Seleccione una opcion: "))
+    
+    if(opcion == 2):
+        interfaz_ver_evento()
+        imprimir_eventos(calendario)
+        interfaz_bienvenida_gestor_eventos()
+        opcion = int(input("Seleccione una opcion: "))
+    
+    if(opcion == 3):
+        interfaz_eliminar_evento()
+        fechaAEliminar = input("Ingresa la fecha del evento a eliminar en YYYY-MM-DD: ")
+        eliminarEvento(calendario,fechaAEliminar)
+        interfaz_bienvenida_gestor_eventos()
+        opcion = int(input("Seleccione una opcion: "))
+    
+    if(opcion == 4):
+        interfaz_mostrar_calendario()
+        año = int(input("Ingrese el año a visualizar: "))
+        mostrarCalendario(año,calendario)
+        interfaz_bienvenida_gestor_eventos()
+        opcion = int(input("Seleccione una opcion: "))
+    
+    if(opcion == 5):
+        interfaz_buscar_evento()
+        fechaABuscar = input("Ingresa la fecha del evento a buscar en YYYY-MM-DD: ")
+        buscarEvento(calendario, fechaABuscar)
+        interfaz_bienvenida_gestor_eventos()
+        opcion = int(input("Seleccione una opcion: "))
+    
+    if(opcion == 6):
+        interfaz_salir_gestor_eventos()
+        opcion = -1
+        break
+interfaz_salir_programa()          

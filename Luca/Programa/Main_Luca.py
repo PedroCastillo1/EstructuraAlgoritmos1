@@ -89,7 +89,7 @@ def mostrarCalendario(año, eventos):
 
             # Marca con corchetes si hay evento
             #if fecha_actual in eventos:
-            if fecha_actual in [evento[0] for evento in eventos]: # FUE MODIFICADO!!!!!!!!!!!!!!!!!!!
+            if fecha_actual in [evento[0] for evento in eventos]: # MODIFICAR CONDICCION PARA QUE SE HAGA MAS SIMPLE
                 print(f"[{dia:2d}]", end="\t")
             else:
                 print(f"{dia:2d}", end="\t")
@@ -126,10 +126,10 @@ def eliminarEvento(calendario, fechaAEliminar):
     if not validarFecha(fechaAEliminar):
         return print("Fecha inválida")
     
-    for i in range(len(calendario)):
-        if calendario[i][0] == fechaAEliminar:
-            evento_eliminado = calendario.pop(i)
-            print(f"Eliminando '{evento_eliminado[1]['cliente']}' el {fechaAEliminar}.")
+    for evento in calendario:
+        if evento[0] == fechaAEliminar:
+            calendario.remove(evento)
+            print(f"Eliminando '{evento[1]['cliente']}' el {fechaAEliminar}.")
             return
     print(f"No hay eventos el {fechaAEliminar}.")
 
@@ -250,7 +250,8 @@ def imprimir_eventos(calendario):
     # Ordenar eventos por total (mayor a menor)
     for i in range(len(lista_eventos)):
         for j in range(i + 1, len(lista_eventos)):
-            if lista_eventos[j]["total"] > lista_eventos[i]["total"]:
+            ####################################################################
+            if lista_eventos[j]["total"] > lista_eventos[i]["total"]: # MODIFICAR CONDICIONAL QUE LO REALICE DE OTRA FORMA MAS SIMPLE
                 aux = lista_eventos[i]
                 lista_eventos[i] = lista_eventos[j]
                 lista_eventos[j] = aux
@@ -346,9 +347,6 @@ def opcionCrearEvento(calendario,servicios,listaEventos):
     # Creamos las listas donde se van a guardar los servicios elegidos y el precio de cada uno
     serviciosElegidos = []
     precios = []
-
-    print("\n ###  holaaa lucaaaa ###\n")
-
 
     # Agrega a las listas la cantidad de persona y calcula y guarda en la lista precios el valor total de cada persana
     #---------------------------------------------------------

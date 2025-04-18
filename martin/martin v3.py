@@ -69,27 +69,30 @@ def mostrarCalendario(año, eventos):
     """
         Función para mostrar el calendario anual
     """
-    # Nombres de los meses en una lista
     meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
              "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 
+    # Prepara una lista de fechas para búsqueda rápida
+    fechas_eventos = []
+    for evento in eventos:
+        fechas_eventos.append(evento[0])
+
     for mes in range(1, 13): # recorre los meses (1 hasta 12)
         print("\n" + meses[mes - 1] + " " + str(año))
-        print("Dom\tLun\tMar\tMie\tJue\tVie\tSab")  # Encabezado de días
+        print("Dom\tLun\tMar\tMie\tJue\tVie\tSab") # Encabezado de días
 
-        primer_dia_semana = diadelasemana(1, mes, año)
+        primer_dia_semana = diadelasemana(1, mes, año) 
         if primer_dia_semana != 0:
-            print("\t" * primer_dia_semana, end="")  # Espacios iniciales
+            print("\t" * primer_dia_semana, end="") # Espacios iniciales
 
         dias_mes = diasDelMes(año, mes)
-        
+
         for dia in range(1, dias_mes + 1):
             fecha_actual = f"{año:04d}-{mes:02d}-{dia:02d}"
             num_dia_semana = diadelasemana(dia, mes, año)
-
+            
             # Marca con corchetes si hay evento
-            #if fecha_actual in eventos:
-            if fecha_actual in [evento[0] for evento in eventos]: # MODIFICAR CONDICCION PARA QUE SE HAGA MAS SIMPLE
+            if fecha_actual in fechas_eventos:
                 print(f"[{dia:2d}]", end="\t")
             else:
                 print(f"{dia:2d}", end="\t")
@@ -137,9 +140,11 @@ def eliminarEvento(calendario, fechaAEliminar):
     print(f"No hay eventos el {fechaAEliminar}.")
 
 
-#############################################################################################################################################
-# Función para buscar un evento
+###########################################################################################################################################
 def buscarEvento(calendario, fecha):
+    """
+        Función para buscar un evento
+    """
     if not validarFecha(fecha):
         return print("Fecha inválida")
 
@@ -147,10 +152,10 @@ def buscarEvento(calendario, fecha):
         if registro[0] == fecha:
             eventoEncontrado = registro[1]
             evento = []
-            evento.append(eventoEncontrado[0])#cliente
-            evento.append(eventoEncontrado [1])#tipo
-            evento.append(eventoEncontrado[2])#servicios
-            evento.append(eventoEncontrado[3])# precios
+            evento.append(eventoEncontrado[0])    #cliente
+            evento.append(eventoEncontrado [1])   #tipo
+            evento.append(eventoEncontrado[2])    #servicios
+            evento.append(eventoEncontrado[3])    # precios
             return imprimirEvento(evento, fecha)
     
     print(f"No hay eventos el {fecha}.")
@@ -158,7 +163,6 @@ def buscarEvento(calendario, fecha):
 def verificarServiciosElegidos(serviciosElegidos, servicioAAgregar):
     """
         Verifica si el servicio ya esta en la lista de servicios elegidos
-
     """
     #creo una variable booleana
     resultado = True
@@ -224,12 +228,12 @@ def imprimir_eventos(calendario):
 
     # Preparar lista auxiliar con total por evento
     for evento in calendario:
-        fecha = evento[0]
-        datos = evento[1]  # [cliente, tipo, servicios, precios]
-        cliente = datos[0]
-        tipo = datos[1]
-        servicios = datos[2]
-        precios = datos[3]
+        fecha = evento[0]     # ["2020-02-02"]
+        datos = evento[1]     # [cliente, tipo, servicios, precios]
+        cliente = datos[0]    # [Cliente]
+        tipo = datos[1]       # [Tipo]
+        servicios = datos[2]  # [Servicio]
+        precios = datos[3]    # [Precio]
         total = 0
         for precio in precios:
             total += precio
@@ -382,8 +386,6 @@ def opcionCrearEvento(calendario,servicios,listaEventos):
     # Crea una lista evento que va a cargarla con la funcion crearevento pasandole todos sus parametros
     evento = crearEvento(listaEventos, cliente, tipoEvento,serviciosElegidos,precios)
 
-    # Imprime el evento creado
-
     # Ingresamos por teclado la fecha que se realizara el evento
     fecha = input("Ingrese la fecha del evento en este formato YYYY-MM-DD: ")
     # llamamos a la funcion validarfecha para comprobar que se halla ingresado correctamente
@@ -391,6 +393,7 @@ def opcionCrearEvento(calendario,servicios,listaEventos):
         # Informa que se ingreso mal y que vuelva a intentar
         fecha = input("Fecha invalida ingrese una fecha valida en este formato YYYY-MM-DD: ")
 
+    # Imprime el evento creado
     imprimirEvento(evento, fecha)    
     
     # Va a agregar al calendario el evento en su fecha correspondiente

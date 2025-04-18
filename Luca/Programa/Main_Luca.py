@@ -69,35 +69,37 @@ def mostrarCalendario(año, eventos):
     """
         Función para mostrar el calendario anual
     """
-    # Nombres de los meses en una lista
     meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
              "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 
-    for mes in range(1, 13): # recorre los meses (1 hasta 12)
+    # Prepara una lista de fechas para búsqueda rápida
+    fechas_eventos = []
+    for evento in eventos:
+        fechas_eventos.append(evento[0])
+
+    for mes in range(1, 13):
         print("\n" + meses[mes - 1] + " " + str(año))
-        print("Dom\tLun\tMar\tMie\tJue\tVie\tSab")  # Encabezado de días
+        print("Dom\tLun\tMar\tMie\tJue\tVie\tSab")
 
         primer_dia_semana = diadelasemana(1, mes, año)
         if primer_dia_semana != 0:
-            print("\t" * primer_dia_semana, end="")  # Espacios iniciales
+            print("\t" * primer_dia_semana, end="")
 
         dias_mes = diasDelMes(año, mes)
-        
+
         for dia in range(1, dias_mes + 1):
             fecha_actual = f"{año:04d}-{mes:02d}-{dia:02d}"
             num_dia_semana = diadelasemana(dia, mes, año)
 
-            # Marca con corchetes si hay evento
-            #if fecha_actual in eventos:
-            if fecha_actual in [evento[0] for evento in eventos]: # MODIFICAR CONDICCION PARA QUE SE HAGA MAS SIMPLE
+            if fecha_actual in fechas_eventos:
                 print(f"[{dia:2d}]", end="\t")
             else:
                 print(f"{dia:2d}", end="\t")
 
-            # Si es sábado, salta de línea (porque domingo es 0)
             if num_dia_semana == 6:
                 print()
         print()  # Línea en blanco al final de cada mes
+
 #############################################################################################################################################
 def agregarEventoACalendario(calendario, fecha, eventoAAgregar):
     # Buscar si la fecha ya está en el calendario

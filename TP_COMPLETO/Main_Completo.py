@@ -69,27 +69,30 @@ def mostrarCalendario(año, eventos):
     """
         Función para mostrar el calendario anual
     """
-    # Nombres de los meses en una lista
     meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
              "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 
+    # Prepara una lista de fechas para búsqueda rápida
+    fechas_eventos = []
+    for evento in eventos:
+        fechas_eventos.append(evento[0])
+
     for mes in range(1, 13): # recorre los meses (1 hasta 12)
         print("\n" + meses[mes - 1] + " " + str(año))
-        print("Dom\tLun\tMar\tMie\tJue\tVie\tSab")  # Encabezado de días
+        print("Dom\tLun\tMar\tMie\tJue\tVie\tSab") # Encabezado de días
 
-        primer_dia_semana = diadelasemana(1, mes, año)
+        primer_dia_semana = diadelasemana(1, mes, año) 
         if primer_dia_semana != 0:
-            print("\t" * primer_dia_semana, end="")  # Espacios iniciales
+            print("\t" * primer_dia_semana, end="") # Espacios iniciales
 
         dias_mes = diasDelMes(año, mes)
-        
+
         for dia in range(1, dias_mes + 1):
             fecha_actual = f"{año:04d}-{mes:02d}-{dia:02d}"
             num_dia_semana = diadelasemana(dia, mes, año)
-
+            
             # Marca con corchetes si hay evento
-            #if fecha_actual in eventos:
-            if fecha_actual in [evento[0] for evento in eventos]: # FUE MODIFICADO!!!!!!!!!!!!!!!!!!!
+            if fecha_actual in fechas_eventos:
                 print(f"[{dia:2d}]", end="\t")
             else:
                 print(f"{dia:2d}", end="\t")
@@ -100,6 +103,7 @@ def mostrarCalendario(año, eventos):
         print()  # Línea en blanco al final de cada mes
 #############################################################################################################################################
 def agregarEventoACalendario(calendario, fecha, eventoAAgregar):
+
     # Buscar si la fecha ya está en el calendario
     for evento in calendario:
         if evento[0] == fecha:
@@ -116,7 +120,8 @@ def agregarEventoACalendario(calendario, fecha, eventoAAgregar):
     precio = eventoAAgregar[3]
 
     # Agregar el evento como una lista dentro de la lista principal
-    calendario.append([fecha, {"cliente": cliente, "tipoDeEvento": tipoEvento, "servicios": servicios, "precio": precio}])
+    calendario.append([fecha, [cliente, tipoEvento, servicios, precio]])
+
     
     print(f"Evento '{cliente}' agregado el {fecha}.")
 
@@ -126,17 +131,20 @@ def eliminarEvento(calendario, fechaAEliminar):
     if not validarFecha(fechaAEliminar):
         return print("Fecha inválida")
     
-    for i in range(len(calendario)):
-        if calendario[i][0] == fechaAEliminar:
-            evento_eliminado = calendario.pop(i)
-            print(f"Eliminando '{evento_eliminado[1]['cliente']}' el {fechaAEliminar}.")
+    for evento in calendario:
+        if evento[0] == fechaAEliminar:
+            cliente = evento[1][0]# Accedemos por índice a la lista
+            calendario.remove(evento) 
+            print(f"Eliminando '{cliente}' el {fechaAEliminar}.")
             return
     print(f"No hay eventos el {fechaAEliminar}.")
 
 
-#############################################################################################################################################
-# Función para buscar un evento
+###########################################################################################################################################
 def buscarEvento(calendario, fecha):
+    """
+        Función para buscar un evento
+    """
     if not validarFecha(fecha):
         return print("Fecha inválida")
 
@@ -144,18 +152,17 @@ def buscarEvento(calendario, fecha):
         if registro[0] == fecha:
             eventoEncontrado = registro[1]
             evento = []
-            evento.append(eventoEncontrado['cliente'])
-            evento.append(eventoEncontrado['tipoDeEvento'])
-            evento.append(eventoEncontrado['servicios'])
-            evento.append(eventoEncontrado['precio'])
-            return imprimirEvento(evento)
+            evento.append(eventoEncontrado[0])    #cliente
+            evento.append(eventoEncontrado [1])   #tipo
+            evento.append(eventoEncontrado[2])    #servicios
+            evento.append(eventoEncontrado[3])    # precios
+            return imprimirEvento(evento, fecha)
     
     print(f"No hay eventos el {fecha}.")
 
 def verificarServiciosElegidos(serviciosElegidos, servicioAAgregar):
     """
-        Verifica si es nombre ya esta en la lista de servicios elegidos
-
+        Verifica si el servicio ya esta en la lista de servicios elegidos
     """
     #creo una variable booleana
     resultado = True
@@ -181,26 +188,24 @@ def crearEvento(listaEventos,cliente,tipoEvento,servicios,precios):
     evento.append(precios)
     listaEventos.append(evento)
     return evento
-####################################################Funciones Impresion############################################################################
-def imprimirEvento(evento):
+####################################################Funciones Impresion##################################################################
+def imprimirEvento(evento,fecha):
     """
         Función para imprimir los evento
     """
-    # Calcular el total por evento
     cliente = evento[0]
     tipo_evento = evento[1]
     servicios = evento[2]
     precios = evento[3]
     total = 0
     for precio in precios:
-          total += precio
+        total += precio
 
-    # Imprimir los eventos ordenados
     print("╔════════════════════════════════════════════════════════════════════╗")
     print("║                    DETALLE DE EVENTO EN SALÓN                      ║")
     print("╚════════════════════════════════════════════════════════════════════╝")
-    
-    print(f"\nCliente: {cliente}")
+    print(f"Fecha: {fecha}")
+    print(f"Cliente: {cliente}")
     print(f"Tipo de Evento: {tipo_evento}")
     print("┌────────────────────────────────┬────────────┐")
     print("│          Servicio              │   Precio   │")
@@ -208,74 +213,73 @@ def imprimirEvento(evento):
 
     for i in range(len(servicios)):
         print(f"│ {servicios[i]:<30} │ ${precios[i]:<10}│")
-        
+
     print("└────────────────────────────────┴────────────┘")
     print(f"TOTAL del evento: ${total}")
 
-def imprimirServicios(servicios):
-    print("\n+--------------------------+-------------+")
-    print("|        SERVICIO         |   PRECIO    |")
-    print("+--------------------------+-------------+")
-    for i in range(len(servicios)):
-        nombre = servicios[i][0]
-        precio = servicios[i][1]
-        print(f"| {i}: {nombre:<22} | ${precio:<9} |")
-    print("+--------------------------+-------------+")
 
 def imprimir_eventos(calendario):
+    """
+        Imprime todos los eventos del calendario ordenados por total (de mayor a menor).
+        Cada evento se muestra con su fecha.
+    """
     total_general = 0
     lista_eventos = []
 
-    # Crear lista auxiliar con totales
+    # Preparar lista auxiliar con total por evento
     for evento in calendario:
-        fecha = evento[0]  # La fecha está en el primer elemento de la lista
-        datos = evento[1]  # Los datos del evento están en el segundo elemento (diccionario)
+        fecha = evento[0]     # ["2020-02-02"]
+        datos = evento[1]     # [cliente, tipo, servicios, precios]
+        cliente = datos[0]    # [Cliente]
+        tipo = datos[1]       # [Tipo]
+        servicios = datos[2]  # [Servicio]
+        precios = datos[3]    # [Precio]
+        total = 0
+        for precio in precios:
+            total += precio
 
-        # Si "precio" es una lista, sumamos todos los precios
-        total = sum(datos["precio"])
-        
-        
-        lista_eventos.append({
-            "fecha": fecha,
-            "cliente": datos["cliente"],
-            "tipoDeEvento": datos["tipoDeEvento"],
-            "servicios": datos["servicios"],
-            "precio": datos["precio"],
-            "total": total
-        })
-    """ 
-    # Ordenar eventos por total (mayor a menor)
-    lista_eventos.sort(key=lambda x: x["total"], reverse=True)
-    """
-    # Ordenar eventos por total (mayor a menor)
+        lista_eventos.append([fecha, cliente, tipo, servicios, precios, total])
+
+    # Ordenar por total descendente (burbuja)
     for i in range(len(lista_eventos)):
         for j in range(i + 1, len(lista_eventos)):
-            if lista_eventos[j]["total"] > lista_eventos[i]["total"]:
+            if lista_eventos[j][5] > lista_eventos[i][5]:
                 aux = lista_eventos[i]
                 lista_eventos[i] = lista_eventos[j]
                 lista_eventos[j] = aux
-                
-    # Imprimir eventos
+
+    # Encabezado general
     print("╔════════════════════════════════════════════════════════════════════╗")
     print("║                  DETALLE DE EVENTOS CON FECHAS                     ║")
     print("╚════════════════════════════════════════════════════════════════════╝")
-    
+
+    # Mostrar cada evento usando imprimirEvento
     for e in lista_eventos:
-        print(f"\nCliente: {e['cliente']}")
-        print(f"Tipo de Evento: {e['tipoDeEvento']}")
-        print(f"Fecha: {e['fecha']}")
-        print("┌────────────────────────────────┬────────────┐")
-        print("│          Servicio              │   Precio   │")
-        print("├────────────────────────────────┼────────────┤")
-        for i in range(len(e["servicios"])):
-            print(f"│ {e['servicios'][i]:<30} │ ${e['precio'][i]:<10}│")
-        print("└────────────────────────────────┴────────────┘")
-        print(f"TOTAL del evento: ${e['total']}")
-        total_general += e["total"]
+        evento = [e[1], e[2], e[3], e[4]]  # cliente, tipo, servicios, precios
+        imprimirEvento(evento, e[0])      # usamos fecha
+        total_general += e[5]
 
     print("\n════════════════════════════════════════════════════════════════════")
     print(f"TOTAL GENERAL INGRESADO POR TODOS LOS EVENTOS: ${total_general}")
     print("════════════════════════════════════════════════════════════════════")
+
+
+def imprimirServicios(servicios):
+    """
+        Muestra en forma de tabla todos los servicios disponibles con su precio.
+        La variable 'servicios' es una matriz con pares: [nombre_servicio, precio]
+    """
+    print("\n+--------------------------+-------------+")
+    print("|        SERVICIO         |   PRECIO    |")
+    print("+--------------------------+-------------+")
+    
+    for i in range(len(servicios)):
+        nombre = servicios[i][0]
+        precio = servicios[i][1]
+        print(f"| {i}: {nombre:<22} | ${precio:<9} |")
+    
+    print("+--------------------------+-------------+")
+
 
 
 # Llamada a la función
@@ -335,77 +339,119 @@ def interfaz_salir_gestor_eventos():
 
 def opcionCrearEvento(calendario,servicios,listaEventos):
     interfaz_crear_evento()
+
+    # Ingresamos por teclado los datos del evento
+    #-----------------------------------------------------------------------------------
     cliente = input("Ingrese su nombre: ")
     tipoEvento = input("Ingrese el tipo de evento: ")
     cantPersonas = int(input("Ingrese la cantidad de personas que vendran al evento: "))
+    #-----------------------------------------------------------------------------------
+
+    # Creamos las listas donde se van a guardar los servicios elegidos y el precio de cada uno
     serviciosElegidos = []
     precios = []
+
+    # Agrega a las listas la cantidad de persona y calcula y guarda en la lista precios el valor total de cada persana
+    #---------------------------------------------------------
     serviciosElegidos.append(f"CantPersonas({cantPersonas})")
     precios.append(cantPersonas*1000)
+    #---------------------------------------------------------
+
+    # Mostramos los servicios disponibles a incluir
     imprimirServicios(servicios)
+    
+
+    
+    #--------------------------------------  SERVICIOS A ELEGIR --------------------------------------------------
     opcionServ = int(input("Elija por favor un servicio a agregar, si no quiere agregar servicios presiona -1: "))
     while opcionServ != -1:
         if (0 <= opcionServ < len(servicios)):
+
+            # Verificamos que si la opcion a elegir esta disponible o ya fue elegida
+            # Servicios [opcionserv][0] --------> Es la matriz donde tenemos guardados todos los servicios y sus precios
             if verificarServiciosElegidos(serviciosElegidos, servicios[opcionServ][0]) == True:
+
+                # Se agrega el servicio y el precio a las listas
                 serviciosElegidos.append(servicios[opcionServ][0])
                 precios.append(servicios[opcionServ][1])
             else:
+                # Informa que ya fue seleccionado antes
                 print("Este servicio ya esta seleccionado!")
                 opcionServ = int(input("Elija por favor un servicio a agregar, si no quiere agregar servicios presiona -1: "))
         else:
+            # Informa que se ingreso mal los valores para elegir las opciones
             opcionServ = int(input("Numero no valido por favor elija otro, si no quiere agregar servicios presiona -1: "))
+    #--------------------------------------  SERVICIOS A ELEGIR --------------------------------------------------
+
+    # Crea una lista evento que va a cargarla con la funcion crearevento pasandole todos sus parametros
     evento = crearEvento(listaEventos, cliente, tipoEvento,serviciosElegidos,precios)
-    imprimirEvento(evento)
+
+    # Ingresamos por teclado la fecha que se realizara el evento
     fecha = input("Ingrese la fecha del evento en este formato YYYY-MM-DD: ")
+    # llamamos a la funcion validarfecha para comprobar que se halla ingresado correctamente
     while validarFecha(fecha) == False:
+        # Informa que se ingreso mal y que vuelva a intentar
         fecha = input("Fecha invalida ingrese una fecha valida en este formato YYYY-MM-DD: ")
+
+    # Imprime el evento creado
+    imprimirEvento(evento, fecha)    
+    
+    # Va a agregar al calendario el evento en su fecha correspondiente
     agregarEventoACalendario(calendario, fecha, evento)
 
 
-#Programa Principal
+##################################  PROGRAMA PRINCIPAL ###########################################
+
+#Creamos las lista vacias de Eventos y Calendario
 listaEventos = []
 calendario = []
+
+# Creamos una matriz con los servicios a incluir en los eventos
 servicios = [["Catering Caro", 200000], ["Catering Barato", 75000], ["Dj", 50000], ["Fotografo", 20000]]
+
 interfaz_bienvenida_gestor_eventos()
 
+# Ingresamos por teclado la opcion a elegir 
 opcion = int(input("Seleccione una opcion: "))
 while (0 < opcion < 7):
-    if opcion == 1:
+    if opcion == 1: #---------------- CREAR UN EVENTO ---------------------
         opcionCrearEvento(calendario,servicios,listaEventos)
         interfaz_bienvenida_gestor_eventos()
         opcion = int(input("Seleccione una opcion: "))
     
-    if(opcion == 2):
+    if(opcion == 2): #---------------- VER TODOS LOS EVENTOS ---------------------
         interfaz_ver_evento()
         imprimir_eventos(calendario)
         interfaz_bienvenida_gestor_eventos()
         opcion = int(input("Seleccione una opcion: "))
     
-    if(opcion == 3):
+    if(opcion == 3): #---------------- ELIMINAR UN EVENTO ---------------------
         interfaz_eliminar_evento()
         fechaAEliminar = input("Ingresa la fecha del evento a eliminar en YYYY-MM-DD: ")
         eliminarEvento(calendario,fechaAEliminar)
         interfaz_bienvenida_gestor_eventos()
         opcion = int(input("Seleccione una opcion: "))
     
-    if(opcion == 4):
+    if(opcion == 4): #---------------- IMPRIMIR EL CALENDARIO ---------------------
         interfaz_mostrar_calendario()
         año = int(input("Ingrese el año a visualizar: "))
         mostrarCalendario(año,calendario)
         interfaz_bienvenida_gestor_eventos()
         opcion = int(input("Seleccione una opcion: "))
     
-    if(opcion == 5):
+    if(opcion == 5): #---------------- BUSCAR UN EVENTO ---------------------
         interfaz_buscar_evento()
         fechaABuscar = input("Ingresa la fecha del evento a buscar en YYYY-MM-DD: ")
         buscarEvento(calendario, fechaABuscar)
         interfaz_bienvenida_gestor_eventos()
         opcion = int(input("Seleccione una opcion: "))
     
-    if(opcion == 6):
+    if(opcion == 6): #---------------- SALIR DE INTERFAZ DE EVENTO ---------------------
         interfaz_salir_gestor_eventos()
         opcion = -1
         break
+
+# FIN DEL PROGRAMA
 interfaz_salir_programa()          
 
 """

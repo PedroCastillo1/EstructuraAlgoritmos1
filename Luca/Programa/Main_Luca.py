@@ -67,38 +67,57 @@ def diasDelMes(año, mes):
 
 def mostrarCalendario(año, eventos):
     """
-        Función para mostrar el calendario anual
+        Función para mostrar el calendario anual.
+        Recibe un año y una lista de eventos.
+        Muestra mes por mes los días y marca con corchetes [ ] si hay un evento en esa fecha.
     """
+    # Lista de nombres de los meses, para mostrar en el calendario.
     meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
              "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 
-    # Prepara una lista de fechas para búsqueda rápida
+    # Prepara una lista vacía que almacenará solo las fechas de los eventos para facilitar la búsqueda.
     fechas_eventos = []
+    # Recorre cada evento de la lista de eventos.
     for evento in eventos:
+        # Agrega la fecha (que se espera esté en la posición 0 de cada evento) a la lista fechas_eventos.
         fechas_eventos.append(evento[0])
 
-    for mes in range(1, 13):
+    # Recorre todos los meses del año, del 1 al 12.
+    for mes in range(1, 13):  # recorre los meses (1 hasta 12)
+        # Imprime el nombre del mes y el año, por ejemplo: "Enero 2025".
         print("\n" + meses[mes - 1] + " " + str(año))
-        print("Dom\tLun\tMar\tMie\tJue\tVie\tSab")
+        # Imprime el encabezado de los días de la semana.
+        print("Dom\tLun\tMar\tMie\tJue\tVie\tSab")  # Encabezado de días
 
+        # Llama a la función diadelasemana para saber en qué día de la semana empieza el mes.
         primer_dia_semana = diadelasemana(1, mes, año)
+        # Si el primer día no es domingo (0), imprime espacios tabulados para alinear el primer día correctamente.
         if primer_dia_semana != 0:
-            print("\t" * primer_dia_semana, end="")
+            print("\t" * primer_dia_semana, end="")  # Espacios iniciales
 
+        # Llama a la función diasDelMes para saber cuántos días tiene el mes (28, 29, 30 o 31).
         dias_mes = diasDelMes(año, mes)
 
+        # Recorre cada día del mes, desde el 1 hasta el último día.
         for dia in range(1, dias_mes + 1):
+            # Genera la fecha en formato "YYYY-MM-DD" para comparar con las fechas de eventos.
             fecha_actual = f"{año:04d}-{mes:02d}-{dia:02d}"
+            # Llama a diadelasemana para saber qué día de la semana corresponde a la fecha.
             num_dia_semana = diadelasemana(dia, mes, año)
 
+            # Si la fecha actual coincide con una fecha de evento, la imprime con corchetes.
             if fecha_actual in fechas_eventos:
                 print(f"[{dia:2d}]", end="\t")
             else:
+                # Si no es un evento, imprime el número de día normalmente.
                 print(f"{dia:2d}", end="\t")
 
+            # Si es sábado (6), imprime un salto de línea para iniciar una nueva fila.
             if num_dia_semana == 6:
                 print()
-        print()  # Línea en blanco al final de cada mes
+        # Imprime una línea en blanco al terminar cada mes.
+        print()
+
 
 #############################################################################################################################################
 def agregarEventoACalendario(calendario, fecha, eventoAAgregar):

@@ -67,40 +67,56 @@ def diasDelMes(año, mes):
 
 def mostrarCalendario(año, eventos):
     """
-        Función para mostrar el calendario anual
+        Función para mostrar el calendario anual.
+        Recibe un año y una lista de eventos.
+        Muestra mes por mes los días y marca con corchetes [ ] si hay un evento en esa fecha.
     """
+    # Lista de nombres de los meses, para mostrar en el calendario.
     meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
              "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 
-    # Prepara una lista de fechas para búsqueda rápida
+    # Prepara una lista vacía que almacenará solo las fechas de los eventos para facilitar la búsqueda.
     fechas_eventos = []
+    # Recorre cada evento de la lista de eventos.
     for evento in eventos:
+        # Agrega la fecha (que se espera esté en la posición 0 de cada evento) a la lista fechas_eventos.
         fechas_eventos.append(evento[0])
 
-    for mes in range(1, 13): # recorre los meses (1 hasta 12)
+    # Recorre todos los meses del año, del 1 al 12.
+    for mes in range(1, 13):  # recorre los meses (1 hasta 12)
+        # Imprime el nombre del mes y el año, por ejemplo: "Enero 2025".
         print("\n" + meses[mes - 1] + " " + str(año))
-        print("Dom\tLun\tMar\tMie\tJue\tVie\tSab") # Encabezado de días
+        # Imprime el encabezado de los días de la semana.
+        print("Dom\tLun\tMar\tMie\tJue\tVie\tSab")  # Encabezado de días
 
-        primer_dia_semana = diadelasemana(1, mes, año) 
+        # Llama a la función diadelasemana para saber en qué día de la semana empieza el mes.
+        primer_dia_semana = diadelasemana(1, mes, año)
+        # Si el primer día no es domingo (0), imprime espacios tabulados para alinear el primer día correctamente.
         if primer_dia_semana != 0:
-            print("\t" * primer_dia_semana, end="") # Espacios iniciales
+            print("\t" * primer_dia_semana, end="")  # Espacios iniciales
 
+        # Llama a la función diasDelMes para saber cuántos días tiene el mes (28, 29, 30 o 31).
         dias_mes = diasDelMes(año, mes)
 
+        # Recorre cada día del mes, desde el 1 hasta el último día.
         for dia in range(1, dias_mes + 1):
+            # Genera la fecha en formato "YYYY-MM-DD" para comparar con las fechas de eventos.
             fecha_actual = f"{año:04d}-{mes:02d}-{dia:02d}"
+            # Llama a diadelasemana para saber qué día de la semana corresponde a la fecha.
             num_dia_semana = diadelasemana(dia, mes, año)
-            
-            # Marca con corchetes si hay evento
+
+            # Si la fecha actual coincide con una fecha de evento, la imprime con corchetes.
             if fecha_actual in fechas_eventos:
                 print(f"[{dia:2d}]", end="\t")
             else:
+                # Si no es un evento, imprime el número de día normalmente.
                 print(f"{dia:2d}", end="\t")
 
-            # Si es sábado, salta de línea (porque domingo es 0)
+            # Si es sábado (6), imprime un salto de línea para iniciar una nueva fila.
             if num_dia_semana == 6:
                 print()
-        print()  # Línea en blanco al final de cada mes
+        # Imprime una línea en blanco al terminar cada mes.
+        print()
 #############################################################################################################################################
 def agregarEventoACalendario(calendario, fecha, eventoAAgregar):
 
@@ -280,10 +296,6 @@ def imprimirServicios(servicios):
     
     print("+--------------------------+-------------+")
 
-
-
-# Llamada a la función
-
 #######################################################Interfaces###################################################################################
 # Interfaces generales
 
@@ -339,38 +351,29 @@ def interfaz_salir_gestor_eventos():
 
 def opcionCrearEvento(calendario,servicios,listaEventos):
     interfaz_crear_evento()
-
     # Ingresamos por teclado los datos del evento
     #-----------------------------------------------------------------------------------
     cliente = input("Ingrese su nombre: ")
     tipoEvento = input("Ingrese el tipo de evento: ")
     cantPersonas = int(input("Ingrese la cantidad de personas que vendran al evento: "))
     #-----------------------------------------------------------------------------------
-
     # Creamos las listas donde se van a guardar los servicios elegidos y el precio de cada uno
     serviciosElegidos = []
     precios = []
-
     # Agrega a las listas la cantidad de persona y calcula y guarda en la lista precios el valor total de cada persana
     #---------------------------------------------------------
     serviciosElegidos.append(f"CantPersonas({cantPersonas})")
     precios.append(cantPersonas*1000)
     #---------------------------------------------------------
-
     # Mostramos los servicios disponibles a incluir
     imprimirServicios(servicios)
-    
-
-    
     #--------------------------------------  SERVICIOS A ELEGIR --------------------------------------------------
     opcionServ = int(input("Elija por favor un servicio a agregar, si no quiere agregar servicios presiona -1: "))
     while opcionServ != -1:
         if (0 <= opcionServ < len(servicios)):
-
             # Verificamos que si la opcion a elegir esta disponible o ya fue elegida
             # Servicios [opcionserv][0] --------> Es la matriz donde tenemos guardados todos los servicios y sus precios
             if verificarServiciosElegidos(serviciosElegidos, servicios[opcionServ][0]) == True:
-
                 # Se agrega el servicio y el precio a las listas
                 serviciosElegidos.append(servicios[opcionServ][0])
                 precios.append(servicios[opcionServ][1])
@@ -382,86 +385,66 @@ def opcionCrearEvento(calendario,servicios,listaEventos):
             # Informa que se ingreso mal los valores para elegir las opciones
             opcionServ = int(input("Numero no valido por favor elija otro, si no quiere agregar servicios presiona -1: "))
     #--------------------------------------  SERVICIOS A ELEGIR --------------------------------------------------
-
     # Crea una lista evento que va a cargarla con la funcion crearevento pasandole todos sus parametros
     evento = crearEvento(listaEventos, cliente, tipoEvento,serviciosElegidos,precios)
-
     # Ingresamos por teclado la fecha que se realizara el evento
     fecha = input("Ingrese la fecha del evento en este formato YYYY-MM-DD: ")
     # llamamos a la funcion validarfecha para comprobar que se halla ingresado correctamente
     while validarFecha(fecha) == False:
         # Informa que se ingreso mal y que vuelva a intentar
         fecha = input("Fecha invalida ingrese una fecha valida en este formato YYYY-MM-DD: ")
-
     # Imprime el evento creado
     imprimirEvento(evento, fecha)    
-    
     # Va a agregar al calendario el evento en su fecha correspondiente
     agregarEventoACalendario(calendario, fecha, evento)
 
-
 ##################################  PROGRAMA PRINCIPAL ###########################################
-
 #Creamos las lista vacias de Eventos y Calendario
 listaEventos = []
 calendario = []
-
 # Creamos una matriz con los servicios a incluir en los eventos
 servicios = [["Catering Caro", 200000], ["Catering Barato", 75000], ["Dj", 50000], ["Fotografo", 20000]]
-
 interfaz_bienvenida_gestor_eventos()
-
 # Ingresamos por teclado la opcion a elegir 
 opcion = int(input("Seleccione una opcion: "))
-while (0 < opcion < 7):
-    if opcion == 1: #---------------- CREAR UN EVENTO ---------------------
-        opcionCrearEvento(calendario,servicios,listaEventos)
+# Mientras la opción sea distinta de 6 (Salir)
+while opcion != 6:
+
+    # Si la opción es válida entre 1 y 5
+    if opcion == 1:  # ---------------- CREAR UN EVENTO ---------------------
+        opcionCrearEvento(calendario, servicios, listaEventos)
         interfaz_bienvenida_gestor_eventos()
-        opcion = int(input("Seleccione una opcion: "))
-    
-    if(opcion == 2): #---------------- VER TODOS LOS EVENTOS ---------------------
+
+    elif opcion == 2:  # ---------------- VER TODOS LOS EVENTOS ---------------------
         interfaz_ver_evento()
         imprimir_eventos(calendario)
         interfaz_bienvenida_gestor_eventos()
-        opcion = int(input("Seleccione una opcion: "))
-    
-    if(opcion == 3): #---------------- ELIMINAR UN EVENTO ---------------------
+
+    elif opcion == 3:  # ---------------- ELIMINAR UN EVENTO ---------------------
         interfaz_eliminar_evento()
         fechaAEliminar = input("Ingresa la fecha del evento a eliminar en YYYY-MM-DD: ")
-        eliminarEvento(calendario,fechaAEliminar)
+        eliminarEvento(calendario, fechaAEliminar)
         interfaz_bienvenida_gestor_eventos()
-        opcion = int(input("Seleccione una opcion: "))
-    
-    if(opcion == 4): #---------------- IMPRIMIR EL CALENDARIO ---------------------
+
+    elif opcion == 4:  # ---------------- IMPRIMIR EL CALENDARIO ---------------------
         interfaz_mostrar_calendario()
         año = int(input("Ingrese el año a visualizar: "))
-        mostrarCalendario(año,calendario)
+        mostrarCalendario(año, calendario)
         interfaz_bienvenida_gestor_eventos()
-        opcion = int(input("Seleccione una opcion: "))
-    
-    if(opcion == 5): #---------------- BUSCAR UN EVENTO ---------------------
+
+    elif opcion == 5:  # ---------------- BUSCAR UN EVENTO ---------------------
         interfaz_buscar_evento()
         fechaABuscar = input("Ingresa la fecha del evento a buscar en YYYY-MM-DD: ")
         buscarEvento(calendario, fechaABuscar)
         interfaz_bienvenida_gestor_eventos()
-        opcion = int(input("Seleccione una opcion: "))
-    
-    if(opcion == 6): #---------------- SALIR DE INTERFAZ DE EVENTO ---------------------
-        interfaz_salir_gestor_eventos()
-        opcion = -1
-        break
 
-# FIN DEL PROGRAMA
-interfaz_salir_programa()          
+    else:
+        # Si no es una opción válida, muestra mensaje de error.
+        print("¡Opción inválida! Por favor ingrese un número del 1 al 6.")
 
-"""
-                        ESTA ES LA FORMA EN COMO SE GUARDAN LOS EVENTOS !!!
-                        
-                calendario es una lista de sublistas (cada sublista es [fecha, evento]).
-                
-calendario = [
-    ["2025-04-20", {"cliente": "Juan Pérez", "tipoDeEvento": "Boda", "servicios": ["Catering", "Música en vivo"], "precio": [500, 1000]}],
-    ["2025-04-21", {"cliente": "Ana López", "tipoDeEvento": "Cumpleaños", "servicios": ["Tarta", "DJ"], "precio": [200, 300]}]
-]
+    # Después de cada acción vuelve a pedir la opción.
+    opcion = int(input("Seleccione una opcion: "))
 
-"""
+# Cuando la opción sea 6 se ejecuta la salida.
+interfaz_salir_gestor_eventos()
+interfaz_salir_programa()

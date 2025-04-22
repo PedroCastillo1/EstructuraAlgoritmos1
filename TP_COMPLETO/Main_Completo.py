@@ -377,6 +377,7 @@ def opcionCrearEvento(calendario,servicios,listaEventos):
                 # Se agrega el servicio y el precio a las listas
                 serviciosElegidos.append(servicios[opcionServ][0])
                 precios.append(servicios[opcionServ][1])
+                opcionServ = int(input("Elija por favor un servicio a agregar, si no quiere agregar servicios presiona -1: "))
             else:
                 # Informa que ya fue seleccionado antes
                 print("Este servicio ya esta seleccionado!")

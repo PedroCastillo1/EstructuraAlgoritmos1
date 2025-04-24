@@ -119,27 +119,49 @@ def mostrarCalendario(año, eventos):
         print()
 #############################################################################################################################################
 def agregarEventoACalendario(calendario, fecha, eventoAAgregar):
+    """
+        - Busca si ya hay un evento con la fecha dada.
 
-    # Buscar si la fecha ya está en el calendario
-    for evento in calendario:
-        if evento[0] == fecha:
-            opcion = input(f"Ya existe un evento en {fecha}. ¿Desea sobrescribirlo? (S/N): ")
-            if opcion.lower() != "s":
-                return print("No se realizó ningún cambio.")
-            else:
-                calendario.remove(evento)  # Eliminar el evento actual para sobrescribirlo
-                break
+        - Si existe, pregunta si se quiere sobrescribir.
+
+        - Si no se quiere sobrescribir, se cancela sin salir abruptamente.
+
+        - Si se quiere sobrescribir (o no había evento en esa fecha), se agrega el nuevo evento.
     
-    cliente = eventoAAgregar[0]
-    tipoEvento = eventoAAgregar[1]
-    servicios = eventoAAgregar[2]
-    precio = eventoAAgregar[3]
+    """
+    indiceEvento = -1 # Guardar el índice de un evento con la misma fecha, si se encuentra
+    continuar = True # Control para decidir si se debe continuar con la agregación del evento
 
-    # Agregar el evento como una lista dentro de la lista principal
-    calendario.append([fecha, [cliente, tipoEvento, servicios, precio]])
+    # Recorrer todos los eventos del calendario para buscar coincidencias con la fecha
+    for i in range(len(calendario)):
+        if calendario[i][0] == fecha: # Si la fecha del evento actual coincide con la fecha dada
+            indiceEvento = i # Guardar el índice de ese evento (por si se necesita sobrescribir)
 
-    
-    print(f"Evento '{cliente}' agregado el {fecha}.")
+    # Si se encontró un evento con la misma fecha (índice distinto de -1)
+    if indiceEvento != -1:
+        # Preguntar al usuario si desea sobrescribir el evento existente
+        opcion = input(f"Ya existe un evento en {fecha}. ¿Desea sobrescribirlo? (S/N): ")
+        
+        # Si el usuario NO quiere sobrescribir el evento existente
+        if opcion.lower() != "s":
+            # Informar que no se hizo ningún cambio
+            print("No se realizó ningún cambio.")
+            # Cambiar la variable de control para evitar que se agregue el nuevo evento
+            continuar = False
+        else:
+            # Si el usuario aceptó sobrescribir, se elimina el evento anterior
+            calendario.pop(indiceEvento)
+
+    # Si la variable de control indica que se debe continuar
+    if (continuar):
+        # Desempaquetar los datos del evento a agregar
+        cliente, tipoEvento, servicios, precio = eventoAAgregar
+
+        # Agregar el nuevo evento al calendario con la fecha indicada
+        calendario.append([fecha, [cliente, tipoEvento, servicios, precio]])
+
+        # Confirmar que el evento fue agregado
+        print(f"Evento '{cliente}' agregado el {fecha}.")
 
 
 #############################################################################################################################################

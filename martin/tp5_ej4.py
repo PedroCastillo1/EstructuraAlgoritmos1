@@ -1,8 +1,10 @@
 def encajan(ficha1, ficha2):
     """Devuelve True si ficha1 y ficha2 comparten al menos un valor, False si no comparten ninguno"""
       
-    
-    return bool(set(ficha1) & set(ficha2))
+    cumple = False
+    if (set(ficha1) & set(ficha2)) :
+        cumple = True
+    return cumple
 
 
 

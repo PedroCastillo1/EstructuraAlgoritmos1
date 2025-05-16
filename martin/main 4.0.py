@@ -428,7 +428,8 @@ def opcionCrearEvento(calendario, servicios_disponibles):
     max_cap = capacidades_salones[salon]
     print(f"El salón {salon} admite hasta {max_cap} personas.")
     val = input(f"Ingrese una cantidad ≤ {max_cap}: ").strip()
-    while int(val) > max_cap:
+    cant = int(val)
+    while cant > max_cap:
         print("Entrada inválida.")
         val = input(f"Ingrese una cantidad ≤ {max_cap}: ").strip()
         if val.isdigit() and 1 <= int(val) <= max_cap:

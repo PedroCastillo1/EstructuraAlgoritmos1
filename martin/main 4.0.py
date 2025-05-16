@@ -391,22 +391,14 @@ def opcionCrearEvento(calendario, servicios_disponibles):
     cliente = input("Ingrese su nombre: ").strip().title()
     tipo    = input("Ingrese el tipo de evento: ").strip().capitalize()
 
-    # 2) Cantidad de personas
-    while True:
-        val = input("Cantidad de personas: ").strip()
-        if val.isdigit() and int(val) > 0:
-            cant = int(val)
-            break
-        print("Por favor ingrese un número entero positivo.")
-
-    # 3) Fecha
+    # 2) Fecha
     while True:
         fecha = input("Fecha del evento (YYYY-MM-DD): ").strip()
         if validarFecha(fecha):
             break
         print("Formato inválido. Use YYYY-MM-DD.")
     
-    # 4) Salón
+    # 3) Salón
     salones = ["Palermo", "Puerto Madero", "Nordelta","San Telmo" , "Recoleta"]
     while True:
         print("Seleccione salón:")
@@ -418,7 +410,7 @@ def opcionCrearEvento(calendario, servicios_disponibles):
             break
         print("Opción inválida.")
 
-    # 5) Turno
+    # 4) Turno
     turnos = ["Mañana", "Tarde", "Noche"]
     while True:
         print("Seleccione turno:")
@@ -432,17 +424,18 @@ def opcionCrearEvento(calendario, servicios_disponibles):
 
 
 
-    # 6) Validar capacidad del salón
+    # 5) Validar capacidad del salón
     max_cap = capacidades_salones[salon]
-    while cant > max_cap:
-        print(f"El salón {salon} admite hasta {max_cap} personas.")
+    print(f"El salón {salon} admite hasta {max_cap} personas.")
+    val = input(f"Ingrese una cantidad ≤ {max_cap}: ").strip()
+    while int(val) > max_cap:
+        print("Entrada inválida.")
         val = input(f"Ingrese una cantidad ≤ {max_cap}: ").strip()
         if val.isdigit() and 1 <= int(val) <= max_cap:
             cant = int(val)
-            break
-        print("Entrada inválida.")    
+            break    
 
-    # 7) Construir dict con TODOS los servicios (fijos + dinámicos)
+    # 6) Construir dict con TODOS los servicios (fijos + dinámicos)
 
     # — Copiamos los servicios “fijos” (DJ, Fotógrafo, etc.) para no modificar el global.
     servicios_evento = servicios_disponibles.copy()

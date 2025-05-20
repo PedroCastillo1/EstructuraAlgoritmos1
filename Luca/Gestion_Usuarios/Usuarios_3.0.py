@@ -39,7 +39,7 @@ def Interfaz_BuscarUsuario():
 
 def Interfaz_MenuAdministrador():
     print("=========================================================================================================")
-    print("|                        MENÚ ADMINISTRADOR (root) - Gestión de Usuarios                               |")
+    print("|                             MENÚ ADMINISTRADOR - Gestión de Usuarios                                  |")
     print("=========================================================================================================")
     print("|                                   1. Crear cuenta                                                     |")
     print("|                                   2. Eliminar cuenta                                                  |")
@@ -78,9 +78,6 @@ def crear_cuenta():
 def eliminar_cuenta():
     Interfaz_EliminarCuenta()
     nombre = input("Ingrese el nombre del usuario que desea eliminar: ")
-    if nombre == "root":
-        print("No se puede eliminar al usuario administrador.")
-        return
     try:
         index = usuarios.index(nombre)
         usuarios.remove(nombre)
@@ -127,17 +124,7 @@ def menu_admin():
             print("Error inesperado.")
 
 def menu_usuario(nombre):
-    while True:
-        print(f"Bienvenido, {nombre}. No tienes permisos para acciones administrativas.")
-        print("Presione -1 para cerrar sesión.")
-        try:
-            opcion = input("Seleccione una opción: ")
-            if opcion == "-1":
-                break
-            else:
-                print("No tienes permisos para esa acción.")
-        except:
-            print("Error inesperado.")
+    print("AQUI VA EL PROGRAMA GESTOR DE EVENTOS")
 
 # ============================
 #        PROGRAMA PRINCIPAL

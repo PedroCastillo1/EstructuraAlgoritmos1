@@ -6,8 +6,7 @@ usuarios = {
 }
 
 eventos = {}
-#########################################################################################################################################
-#########################################################################################################################################
+#=================================================== ZONA DE INTERFACEZ ===========================================================
 def Interfaz_CrearCuenta():
     print("=========================================================================================================")
     print("|                                        CREAR CUENTA (Solo Admin)                                      |")
@@ -83,8 +82,8 @@ def Interfaz_CrearEvento():
     print("=========================================================================================================")
     print("|                                           CREAR EVENTO                                                |")
     print("=========================================================================================================")
-#########################################################################################################################################
-#########################################################################################################################################
+
+#=================================================== ZONA DE CSV ==================================================================
 def cargar_usuarios_desde_csv():
     """
     Carga los usuarios desde el archivo usuarios.csv al diccionario usuarios.
@@ -110,7 +109,7 @@ def cargar_usuarios_desde_csv():
             archivo.close()
         except NameError:
             pass
-#########################################################################################################################################
+#==================================================================================================#
 def guardar_usuarios_en_csv():
     """
     Guarda el contenido actual del diccionario usuarios en el archivo usuarios.csv.
@@ -127,8 +126,8 @@ def guardar_usuarios_en_csv():
         try:
             archivo.close()
         except NameError:
-            pass       
-#########################################################################################################################################
+            pass 
+#==================================================================================================#     
 def cargar_eventos_desde_csv():
     """
     Carga los eventos desde el archivo eventos.csv al diccionario eventos.
@@ -154,7 +153,7 @@ def cargar_eventos_desde_csv():
             archivo.close()
         except NameError:
             pass
-#########################################################################################################################################
+#==================================================================================================#
 def guardar_eventos_en_csv():
     """
     Guarda el contenido actual del diccionario eventos en el archivo eventos.csv.
@@ -174,8 +173,7 @@ def guardar_eventos_en_csv():
             arch.close()
         except NameError:
             pass
-#########################################################################################################################################
-#########################################################################################################################################
+#========================================= ZONA DE FUNCIONES GESTOR DE USUARIO ====================================================
 def crear_cuenta():
     Interfaz_CrearCuenta()
     nuevo = input("Ingrese nombre del nuevo usuario: ")
@@ -187,7 +185,7 @@ def crear_cuenta():
     print("Cuenta creada exitosamente.")
     registrar_auditoria("admin", f"Creó cuenta para {nuevo}")
     guardar_usuarios_en_csv()
-#########################################################################################################################################
+#==================================================================================================#    
 def imprimir_usuarios():
     """Muestra la lista de usuarios y oculta la contraseña."""
     Interfaz_ImprimirUsuarios()
@@ -195,8 +193,7 @@ def imprimir_usuarios():
         clave = usuarios[nombre]["contraseña"]
         rol = usuarios[nombre]["rol"]
         print(f"Usuario: {nombre:<15} | Contraseña: {'*' * len(clave):<10} | Rol: {rol}")
-#########################################################################################################################################
-#########################################################################################################################################
+#==================================================================================================#     
 def buscar_usuario():
     """Permite buscar si un usuario existe en el sistema."""
     Interfaz_BuscarUsuario()
@@ -208,8 +205,7 @@ def buscar_usuario():
             print("El usuario NO existe.")
     except Exception as e:
         print(f"Error al buscar usuario: {str(e)}")
-#########################################################################################################################################
-#########################################################################################################################################
+#==================================================================================================#        
 def eliminar_cuenta():
     Interfaz_EliminarCuenta()
     nombre = input("Ingrese el nombre del usuario que desea eliminar: ")
@@ -217,14 +213,13 @@ def eliminar_cuenta():
         print("No se puede eliminar el usuario administrador.")
         return
     if nombre in usuarios:
-        del usuarios[nombre]
+        usuarios.pop(nombre)
         print("Usuario eliminado correctamente.")
         registrar_auditoria("admin", f"Eliminó cuenta de {nombre}")
         guardar_usuarios_en_csv()
     else:
         print("El usuario no existe.")
-
-#########################################################################################################################################
+#=================================================== ZONA DE AUDITORIA ===========================================================
 def registrar_auditoria(usuario, accion):
     """
     Registra una acción en el archivo de auditoría con fecha y hora.
@@ -247,7 +242,7 @@ def registrar_auditoria(usuario, accion):
             arch.close()
         except NameError:
             pass
-#########################################################################################################################################
+#==================================================================================================#
 def ver_auditoria():
     """
     Muestra el contenido del archivo de auditoría. Solo el administrador accede.
@@ -266,8 +261,7 @@ def ver_auditoria():
             archivo.close()
         except NameError:
             pass
-#########################################################################################################################################
-#########################################################################################################################################
+#=================================================== ZONA DE MENU ADMIN ===========================================================
 def menu_admin():
     while True:
         Interfaz_MenuAdministrador()
@@ -275,10 +269,8 @@ def menu_admin():
             opcion = input("Seleccione una opción: ")
             if opcion == "1":
                 crear_cuenta()
-                registrar_auditoria("admin", "Creó una nueva cuenta")
             elif opcion == "2":
                 eliminar_cuenta()
-                registrar_auditoria("admin", "Eliminó una cuenta")
             elif opcion == "3":
                 imprimir_usuarios()
             elif opcion == "4":
@@ -293,10 +285,7 @@ def menu_admin():
                 print("Opción inválida.")
         except Exception as e:
             print("Error inesperado:", e)
-#########################################################################################################################################
-#########################################################################################################################################
-#########################################################################################################################################
-#########################################################################################################################################
+#=================================================== ZONA DE FUNCIONES EVENTO ===========================================================
 def agregar_evento(usuario):
     """
     Permite al usuario crear un nuevo evento y lo guarda en el diccionario.
@@ -321,22 +310,21 @@ def agregar_evento(usuario):
 
     except Exception as e:
         print("Error al crear el evento:", e)
-#########################################################################################################################################
+#==================================================================================================#
 def ver_eventos(usuario):
     """
-    Muestra todos los eventos registrados por un usuario específico.
+    Muestra todos los eventos registrados en el sistema (acceso libre a todos).
     """
     Interfaz_MisEventos()
-    tiene_eventos = False
+    if not eventos:
+        print("No hay eventos registrados.")
+        return
+
     for clave, datos in eventos.items():
-        if datos[0] == usuario:
-            fecha, salon, turno = clave
-            cliente, tipoevento, cantpersonas = datos
-            print(f"{fecha} | {salon} | {turno} | {tipoevento} | {cantpersonas} personas")
-            tiene_eventos = True
-    if not tiene_eventos:
-        print("No tenés eventos registrados.")
-#########################################################################################################################################
+        fecha, salon, turno = clave
+        cliente, tipoevento, cantpersonas = datos
+        print(f"{fecha} | {salon} | {turno} | Creado por: {cliente} | {tipoevento} | {cantpersonas} personas")
+#==================================================================================================#
 def eliminar_evento(usuario):
     """
     Permite al usuario eliminar un evento que haya registrado.
@@ -349,9 +337,6 @@ def eliminar_evento(usuario):
 
         clave = (fecha, salon, turno)
         if clave in eventos:
-            if eventos[clave][0] != usuario:
-                print("No puedes eliminar eventos que no te pertenecen.")
-                return
             del eventos[clave]
             print("Evento eliminado correctamente.")
             registrar_auditoria(usuario, f"Eliminó un evento en {salon} el {fecha} - {turno}")
@@ -360,8 +345,7 @@ def eliminar_evento(usuario):
             print("No existe un evento registrado con esos datos.")
     except Exception as e:
         print("Error al eliminar el evento:", e)
-#########################################################################################################################################
-#########################################################################################################################################
+#=================================================== ZONA DE MENU EVENTOS ===========================================================
 def menu_eventos(usuario):
     while True:
         Interfaz_MenuEvento()
@@ -376,22 +360,21 @@ def menu_eventos(usuario):
             break
         else:
             print("Opción inválida.")
-#########################################################################################################################################
-#########################################################################################################################################
+#======================================== ZONA DE FUNCION MODIFICAR DATOS PERSONALES ==================================================
 def modificar_datos_personales(usuario):
     Interfaz_ModificarDatos()
     try:
         actual = input("Ingrese su contraseña actual: ")
         if usuarios[usuario]["contraseña"] != actual:
             print("Contraseña incorrecta. No se realizaron cambios.")
-            break
+            return
 
         nueva = input("Ingrese nueva contraseña: ")
         confirmacion = input("Confirme nueva contraseña: ")
 
         if nueva != confirmacion:
             print("Las contraseñas no coinciden. Intente nuevamente.")
-            break
+            return
 
         usuarios[usuario]["contraseña"] = nueva
         print("Contraseña actualizada correctamente.")
@@ -402,7 +385,7 @@ def modificar_datos_personales(usuario):
         print("Error al acceder a los datos del usuario.")
     except Exception as e:
         print(f"Error inesperado: {str(e)}")
-#########################################################################################################################################
+#=================================================== ZONA DE MENU USUARIO ===========================================================
 def menu_usuario(nombre):
     while True:
         Interfaz_MenuUsuario()
@@ -420,7 +403,7 @@ def menu_usuario(nombre):
                 print("Opción inválida.")
         except Exception as e:
             print("Error inesperado:", e)
-#########################################################################################################################################
+#=================================================== ZONA DE FUNCION INICIO DE SESION ===========================================================
 def iniciar_sesion():
     """Solicita credenciales y valida contra el diccionario de usuarios. Devuelve el nombre del usuario si es válido."""
     intentos = 0
@@ -451,10 +434,11 @@ while True:
         entrada = input("Ingrese una opción: ")
         if entrada == "1":
             usuario_actual = iniciar_sesion()
-            if usuario_actual and usuarios[usuario_actual]["rol"] == "admin":
-                menu_admin()
-            else:
-                menu_usuario(usuario_actual)
+            if usuario_actual:
+                if usuario_actual and usuarios[usuario_actual]["rol"] == "admin":
+                    menu_admin()
+                else:
+                    menu_usuario(usuario_actual)
         elif entrada == "-1":
             print("USTED HA FINALIZADO EL PROGRAMA. HASTA LUEGO.")
             break
@@ -462,24 +446,4 @@ while True:
             print("Opción inválida.")
     except:
         print("Error inesperado en el menú principal.")
-#########################################################################################################################################
-#########################################################################################################################################
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#======================================================================================================================================#

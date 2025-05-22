@@ -57,6 +57,7 @@ def iniciar_sesion():
             clave = input("Contraseña: ")
             if nombre in usuarios and usuarios[nombre]["contraseña"] == clave:
                 print("Inicio de sesión exitoso.")
+                registrar_auditoria(nombre, "Inicio de sesión")
                 return nombre
             else:
                 intentos += 1
@@ -69,7 +70,6 @@ def iniciar_sesion():
 #########################################################################################################################################
 #########################################################################################################################################
 def crear_cuenta():
-    """Crea un nuevo usuario (solo admin)."""
     Interfaz_CrearCuenta()
     nuevo = input("Ingrese nombre del nuevo usuario: ")
     if nuevo in usuarios:
@@ -78,6 +78,9 @@ def crear_cuenta():
     clave = input("Ingrese contraseña del nuevo usuario: ")
     usuarios[nuevo] = {"contraseña": clave, "rol": "usuario"}
     print("Cuenta creada exitosamente.")
+    registrar_auditoria("admin", f"Creó cuenta para {nuevo}")
+    guardar_usuarios_en_csv()
+
 #########################################################################################################################################
 #########################################################################################################################################
 def imprimir_usuarios():
@@ -103,19 +106,19 @@ def buscar_usuario():
 #########################################################################################################################################
 #########################################################################################################################################
 def eliminar_cuenta():
-    """Elimina un usuario existente, excepto si es el admin."""
     Interfaz_EliminarCuenta()
     nombre = input("Ingrese el nombre del usuario que desea eliminar: ")
-    
     if nombre == "admin":
         print("No se puede eliminar el usuario administrador.")
         return
-
     if nombre in usuarios:
         del usuarios[nombre]
         print("Usuario eliminado correctamente.")
+        registrar_auditoria("admin", f"Eliminó cuenta de {nombre}")
+        guardar_usuarios_en_csv()
     else:
         print("El usuario no existe.")
+
 #########################################################################################################################################
 #########################################################################################################################################
 from datetime import datetime
@@ -250,16 +253,9 @@ def Interfaz_ModificarDatos():
 #########################################################################################################################################
 #########################################################################################################################################
 def modificar_datos_personales(usuario):
-    """
-    Permite al usuario modificar su contraseña.
-    
-    Parámetros:
-    usuario (str): Nombre del usuario autenticado.
-    """
     print("=========================================================================================================")
     print("|                                 MODIFICAR DATOS PERSONALES                                           |")
     print("=========================================================================================================")
-
     try:
         actual = input("Ingrese su contraseña actual: ")
         if usuarios[usuario]["contraseña"] != actual:
@@ -276,11 +272,13 @@ def modificar_datos_personales(usuario):
         usuarios[usuario]["contraseña"] = nueva
         print("Contraseña actualizada correctamente.")
         registrar_auditoria(usuario, "Modificó su contraseña")
+        guardar_usuarios_en_csv()
 
     except KeyError:
         print("Error al acceder a los datos del usuario.")
     except Exception as e:
         print(f"Error inesperado: {str(e)}")
+
 #########################################################################################################################################
 #########################################################################################################################################
 def Interfaz_MenuUsuario():
@@ -456,11 +454,84 @@ def agregar_evento(usuario):
         print("Error al crear el evento:", e)
 #########################################################################################################################################
 #########################################################################################################################################
+def guardar_usuarios_en_csv():
+    """
+    Guarda el contenido actual del diccionario usuarios en el archivo usuarios.csv.
+    Sobrescribe el archivo completo.
+    """
+    try:
+        archivo = open("usuarios.csv", "wt")
+        for nombre, datos in usuarios.items():
+            linea = f"{nombre},{datos['contraseña']},{datos['rol']}\n"
+            archivo.write(linea)
+    except OSError as mensaje:
+        print("No se puede guardar el archivo de usuarios:", mensaje)
+    finally:
+        try:
+            archivo.close()
+        except NameError:
+            pass
+#########################################################################################################################################
+#########################################################################################################################################
+def cargar_usuarios_desde_csv():
+    """
+    Carga los usuarios desde el archivo usuarios.csv al diccionario usuarios.
+    Si el archivo no existe, arranca con un admin por defecto.
+    """
+    global usuarios
+    usuarios = {}
+
+    try:
+        archivo = open("usuarios.csv", "rt")
+        for linea in archivo:
+            partes = linea.strip().split(",")
+            if len(partes) == 3:
+                nombre, contraseña, rol = partes
+                usuarios[nombre] = {"contraseña": contraseña, "rol": rol}
+    except FileNotFoundError:
+        print("Archivo de usuarios no encontrado. Se creará con usuario admin por defecto.")
+        usuarios["admin"] = {"contraseña": "1234", "rol": "admin"}
+    except OSError as mensaje:
+        print("Error al cargar usuarios:", mensaje)
+    finally:
+        try:
+            archivo.close()
+        except NameError:
+            pass
+#########################################################################################################################################
+#########################################################################################################################################
+def cargar_eventos_desde_csv():
+    """
+    Carga los eventos desde el archivo eventos.csv al diccionario eventos.
+    Si el archivo no existe, el diccionario queda vacío.
+    """
+    global eventos
+    eventos = {}
+
+    try:
+        archivo = open("eventos.csv", "rt")
+        for linea in archivo:
+            partes = linea.strip().split(",")
+            if len(partes) == 6:
+                fecha, salon, turno, cliente, tipoevento, cantpersonas = partes
+                clave = (fecha, salon, turno)
+                eventos[clave] = [cliente, tipoevento, cantpersonas]
+    except FileNotFoundError:
+        print("Archivo de eventos no encontrado. Se iniciará sin eventos.")
+    except OSError as mensaje:
+        print("Error al cargar eventos:", mensaje)
+    finally:
+        try:
+            archivo.close()
+        except NameError:
+            pass
 #########################################################################################################################################
 #########################################################################################################################################
 # ============================
 #        PROGRAMA PRINCIPAL
 # ============================
+cargar_usuarios_desde_csv()
+cargar_eventos_desde_csv()
 while True:
     menu_interactivo()
     try:

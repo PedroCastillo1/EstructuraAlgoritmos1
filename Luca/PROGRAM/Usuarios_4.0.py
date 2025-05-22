@@ -384,14 +384,14 @@ def modificar_datos_personales(usuario):
         actual = input("Ingrese su contraseña actual: ")
         if usuarios[usuario]["contraseña"] != actual:
             print("Contraseña incorrecta. No se realizaron cambios.")
-            return
+            break
 
         nueva = input("Ingrese nueva contraseña: ")
         confirmacion = input("Confirme nueva contraseña: ")
 
         if nueva != confirmacion:
             print("Las contraseñas no coinciden. Intente nuevamente.")
-            return
+            break
 
         usuarios[usuario]["contraseña"] = nueva
         print("Contraseña actualizada correctamente.")

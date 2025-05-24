@@ -15,9 +15,6 @@ PRECIO_SOUND_LIGHTS      = 80000
 PRECIO_DJ          = 50000
 PRECIO_FOTOGRAFO   = 20000
 
-SALONES = ["Palermo", "Puerto Madero", "Nordelta", "San Telmo", "Recoleta"]
-TURNOS  = ["Mañana", "Tarde", "Noche"]
-
 # — Capacidades máximas por salón (entre 20 y 1000) —
 capacidades_salones = {
     "Palermo":        300,
@@ -25,6 +22,17 @@ capacidades_salones = {
     "Nordelta":       150,
     "San Telmo":       80,
     "Recoleta":       500
+}
+
+#Creamos el diccionario Calendario
+calendario = {}
+#Creamos el diccionario con los servicios estaticos disponibles
+servicios_disponibles = {
+    "DJ":                        PRECIO_DJ,
+    "Fotógrafo":                 PRECIO_FOTOGRAFO,
+    "Decoración básica":         PRECIO_DECORACION_BASE,
+    "Transporte":                PRECIO_TRANSPORTE ,
+    "Pack sonido e iluminación": PRECIO_SOUND_LIGHTS
 }
 
 # Interfaces visuales
@@ -45,7 +53,7 @@ def interfaz_salir_programa():
     print("|     Gracias por usar el programa.    |")
     print("|            ¡Hasta pronto!            |")
     print("+--------------------------------------+")
-
+    
 def interfaz_crear_evento():
     print("\n+--------------------------------------------------+")
     print("|              CREAR NUEVO EVENTO                  |")
@@ -74,6 +82,44 @@ def interfaz_buscar_evento():
 def interfaz_salir_gestor_eventos():
     print("\n+--------------------------------------------------+")
     print("|       Saliendo del gestor de eventos...          |")
+    print("+--------------------------------------------------+")
+    
+def interfaz_tipo_evento():
+    print("\n+--------------------------------------------------+")
+    print("|                  TIPO DE EVENTO                  |")
+    print("+--------------------------------------------------+")
+    print("| 1) Fiesta de egresados                           |")
+    print("| 2) Casamiento                                    |")
+    print("| 3: Cumple de XV                                  |")
+    print("| 4: Despedida de soltero                          |")
+    print("| 5: Evento empresarial                            |")
+    print("| 6: Conferencia                                   |")
+    print("|--------------------------------------------------|")
+    print("| 0) Cancelar                                      |")
+    print("+--------------------------------------------------+")
+    
+def interfaz_tipo_salon():
+    print("\n+--------------------------------------------------+")
+    print("|                SELECCIONE SALÓN                  |")
+    print("+--------------------------------------------------+")
+    print("| 1) Palermo                                       |")
+    print("| 2) Puerto Madero                                 |")
+    print("| 3: Nordelta                                      |")
+    print("| 4: San Telmo                                     |")
+    print("| 5: Recoleta                                      |")
+    print("|--------------------------------------------------|")
+    print("| 0) Cancelar                                      |")
+    print("+--------------------------------------------------+")
+    
+def interfaz_tipo_turno():
+    print("\n+--------------------------------------------------+")
+    print("|                SELECCIONE TURNO                  |")
+    print("+--------------------------------------------------+")
+    print("| 1) Mañana                                        |")
+    print("| 2) Tarde                                         |")
+    print("| 3: Noche                                         |")
+    print("|--------------------------------------------------|")
+    print("| 0) Cancelar                                      |")
     print("+--------------------------------------------------+")
 #===================================================================================================================================
 # Validación y calendario
@@ -340,41 +386,27 @@ def agregarEventoACalendario(calendario, fecha, salon, turno, evento):
     # Se informa que el evento fue agregado correctamente, mostrando el nombre del cliente
     print(f"Evento '{evento['cliente']}' agregado el {fecha} en Salón {salon}, Turno {turno}.")
 #===================================================================================================================================
-def eliminarEvento(calendario, fecha, salon, turno):
-    # Crea una clave compuesta (una tupla) con los tres datos que identifican un evento único
-    clave = (fecha, salon, turno)
-    # Verifica si la fecha ingresada es válida llamando a la función validarFecha
-    # Si no lo es, se muestra un mensaje y se sale de la función
-    if not validarFecha(fecha):
-        print("Fecha inválida.")
+def eliminarEvento(calendario):
+    seleccion = seleccionar_fecha_salon_turno(calendario)
+    if not seleccion:
+        print("Eliminación cancelada.")
         return
-    # Verifica si la clave existe en el diccionario calendario (es decir, si hay un evento en esa fecha, salón y turno)
-    if clave in calendario:
-        # Obtiene el nombre del cliente que reservó el evento, accediendo al valor almacenado en esa clave
-        cliente = calendario[clave]["cliente"]
-        # Elimina del calendario ese evento usando el método pop()
-        calendario.pop(clave)
-        # Muestra un mensaje confirmando que el evento fue eliminado
-        print(f"Eliminando evento de '{cliente}' el {fecha} en Salón {salon}, Turno {turno}.")
-    else:
-        # Si la clave no existe, muestra un mensaje indicando que no se encontró ningún evento
-        print(f"No hay eventos el {fecha} en Salón {salon}, Turno {turno}.")
+    fecha, salon, turno = seleccion
+    clave = (fecha, salon, turno)
+    cliente = calendario[clave]["cliente"]
+    calendario.pop(clave)
+    print(f"Eliminando evento de '{cliente}' el {fecha} en Salón {salon}, Turno {turno}.")
+
 #===================================================================================================================================
-def buscarEvento(calendario, fecha, salon, turno):
-    # Crea una clave única con los datos ingresados: fecha, salón y turno
-    clave = (fecha, salon, turno)
-    # Verifica si la fecha ingresada es válida utilizando la función validarFecha
-    # Si la fecha no es válida, muestra un mensaje y finaliza la función
-    if not validarFecha(fecha):
-        print("Fecha inválida.")
+def buscarEvento(calendario):
+    seleccion = seleccionar_fecha_salon_turno(calendario)
+    if not seleccion:
+        print("Búsqueda cancelada.")
         return
-    # Verifica si existe un evento en el calendario con esa clave
-    if clave in calendario:
-        # Si existe, llama a la función imprimirEvento para mostrar los datos del evento
-        imprimirEvento(clave, calendario[clave])
-    else:
-        # Si no existe, informa al usuario que no se encontró ningún evento en esa fecha, salón y turno
-        print(f"No hay eventos el {fecha} en Salón {salon}, Turno {turno}.")
+    fecha, salon, turno = seleccion
+    clave = (fecha, salon, turno)
+    imprimirEvento(clave, calendario[clave])
+
 #===================================================================================================================================
 def imprimirEvento(clave, evento):
     """
@@ -440,79 +472,65 @@ def imprimir_eventos(calendario):
     print("════════════════════════════════════════════════════════════════════")
 
 #===================================================================================================================================
-def imprimir_bloque(titulo, opciones, min_width=48):
+def seleccionar_tipo_evento():
     """
-    Imprime un bloque ASCII de ancho fijo (min_width + 2 bordes),
-    con título centrado, línea separadora, y lista de opciones.
+    Muestra un menú para seleccionar el tipo de evento.
+    Devuelve el nombre del evento seleccionado o None si se cancela.
     """
-    # Calcula el ancho interior (mínimo, longitud del título u opciones)
-    ancho = max(min_width, len(titulo), *(len(opt) for opt in opciones))
-    borde    = "+" + "-" * (ancho + 2) + "+"
-    separador = "|" + "-" * (ancho + 2) + "|"
+    tipos_evento = ["Fiesta de egresados","Casamiento","Cumple de XV","Despedida de soltero","Evento empresarial","Conferencia"]
+    interfaz_tipo_evento()
 
-    print(borde)
-    print(f"| {titulo.center(ancho)} |")
-    print(separador)
-    for opt in opciones:
-        print(f"| {opt.ljust(ancho)} |")
-    print(borde)
+    while True:
+        opcion = input(f"Seleccione una opción (1-{len(tipos_evento)} o 0 para cancelar): ").strip()
+        if opcion == "0":
+            return None
+        if opcion.isdigit() and 1 <= int(opcion) <= len(tipos_evento):
+            return tipos_evento[int(opcion) - 1]
+        print("Opción inválida. Intente nuevamente.")
+        
+def seleccionar_salon():
+    """
+    Muestra un menú para seleccionar un salón.
+    Devuelve el nombre del salón seleccionado o None si se cancela.
+    """
+    SALONES = ["Palermo","Puerto Madero","Nordelta","San Telmo","Recoleta"]
+    interfaz_tipo_salon()
 
+    while True:
+        opcion = input(f"Seleccione un salón (1-{len(SALONES)} o 0 para cancelar): ").strip()
+        if opcion == "0":
+            return None
+        if opcion.isdigit() and 1 <= int(opcion) <= len(SALONES):
+            return SALONES[int(opcion) - 1]
+        print("Opción inválida. Intente nuevamente.")
+
+def seleccionar_turno():
+    """
+    Muestra un menú para seleccionar un turno.
+    Devuelve el nombre del turno seleccionado o None si se cancela.
+    """
+    TURNOS  = ["Mañana","Tarde","Noche"]
+    interfaz_tipo_turno()
+
+    while True:
+        opcion = input(f"Seleccione un salón (1-{len(TURNOS)} o 0 para cancelar): ").strip()
+        if opcion == "0":
+            return None
+        if opcion.isdigit() and 1 <= int(opcion) <= len(TURNOS):
+            return TURNOS[int(opcion) - 1]
+        print("Opción inválida. Intente nuevamente.")
 
 #===================================================================================================================================
-def imprimir_bloque(titulo, opciones, min_width=48, separar_ultimo=False):
-    """
-    Imprime un bloque ASCII de ancho fijo (mínimo interior = min_width),
-    con título centrado, línea separadora y lista de opciones.
-    Si separar_ultimo=True, dibuja una línea adicional antes de la última opción.
-    """
-    ancho = max(min_width, len(titulo), *(len(opt) for opt in opciones))
-    borde     = "+" + "-" * (ancho + 2) + "+"
-    separador = "|" + "-" * (ancho + 2) + "|"
-
-    print(borde)
-    print(f"| {titulo.center(ancho)} |")
-    print(separador)
-
-    if separar_ultimo and len(opciones) > 1:
-        for opt in opciones[:-1]:
-            print(f"| {opt.ljust(ancho)} |")
-        print(separador)  # separación antes de la última
-        print(f"| {opciones[-1].ljust(ancho)} |")
-    else:
-        for opt in opciones:
-            print(f"| {opt.ljust(ancho)} |")
-
-    print(borde)
-
-
 def opcionCrearEvento(calendario, servicios_disponibles):
-    
     # 1) Cliente
     interfaz_crear_evento()
     cliente = input("Ingrese su nombre: ").strip().title()
 
     # 2) Tipo de evento
-    tipos_evento = [
-        "Fiesta de egresados",
-        "Casamiento",
-        "Cumple de XV",
-        "Despedida de soltero",
-        "Evento empresarial",
-        "Conferencia"
-    ]
-    opciones_tipo = [f"{i}) {t}" for i, t in enumerate(tipos_evento, 1)]
-    opciones_tipo.append("0) Cancelar")
-    imprimir_bloque("TIPO DE EVENTO", opciones_tipo, min_width=48, separar_ultimo=True)
-
-    while True:
-        sel = input(f"Elija tipo (0-{len(tipos_evento)}): ").strip()
-        if sel == "0":
-            return None
-        if sel.isdigit() and 1 <= int(sel) <= len(tipos_evento):
-            tipo = tipos_evento[int(sel) - 1]
-            break
-        print("Opción inválida. Intente nuevamente.")
-
+    tipo_evento = seleccionar_tipo_evento()
+    if tipo_evento is None:
+        return
+    
     # 3) Cantidad de personas
     while True:
         val = input("Cantidad de personas: ").strip()
@@ -529,32 +547,14 @@ def opcionCrearEvento(calendario, servicios_disponibles):
         print("Formato inválido. Use YYYY-MM-DD.")
 
     # 5) Salón
-    opciones_salones = [f"{i}) {s}" for i, s in enumerate(SALONES, 1)]
-    opciones_salones.append("0) Cancelar")
-    imprimir_bloque("SELECCIONE SALÓN", opciones_salones, min_width=48, separar_ultimo=True)
-
-    while True:
-        sel = input(f"Elija salón (0-{len(SALONES)}): ").strip()
-        if sel == "0":
-            return None
-        if sel.isdigit() and 1 <= int(sel) <= len(SALONES):
-            salon = SALONES[int(sel) - 1]
-            break
-        print("Opción inválida. Intente nuevamente.")
+    salon = seleccionar_salon()
+    if salon is None:
+        return
 
     # 6) Turno
-    opciones_turnos = [f"{i}) {t}" for i, t in enumerate(TURNOS, 1)]
-    opciones_turnos.append("0) Cancelar")
-    imprimir_bloque("SELECCIONE TURNO", opciones_turnos, min_width=48, separar_ultimo=True)
-
-    while True:
-        sel = input(f"Elija turno (0-{len(TURNOS)}): ").strip()
-        if sel == "0":
-            return None
-        if sel.isdigit() and 1 <= int(sel) <= len(TURNOS):
-            turno = TURNOS[int(sel) - 1]
-            break
-        print("Opción inválida. Intente nuevamente.")
+    turno = seleccionar_turno()
+    if turno is None:
+        return
 
     # 7) Validar capacidad
     max_cap = capacidades_salones[salon]
@@ -586,87 +586,73 @@ def opcionCrearEvento(calendario, servicios_disponibles):
     precios.append(limpieza)
 
     # 10) Registrar y mostrar evento
-    evento = crearEvento(cliente, tipo, cant, servicios, precios)
+    evento = crearEvento(cliente, tipo_evento, cant, servicios, precios)
     agregarEventoACalendario(calendario, fecha, salon, turno, evento)
     imprimirEvento((fecha, salon, turno), evento)
     return
 
-
-
-def obtener_fecha_salon_y_turno(eventos_calendar, mostrar_interfaz_evento):
+#===================================================================================================================================
+def seleccionar_fecha_salon_turno(calendario):
     """
-    Muestra dos pantallas ASCII para:
-      1) Selección de fecha
-      2) Selección de salón y turno
-    Cada pantalla usa el bloque global `imprimir_bloque`:
-      - Título centrado
-      - Línea de separación antes de la opción 0 (separar_ultimo=True)
-      - Opciones + 0) Salir
-    Devuelve (fecha, salón, turno) o None si se elige 0.
+    Permite seleccionar una fecha, salón y turno de entre los eventos existentes en el calendario.
+    Valida cada paso mostrando solo las opciones disponibles.
+    Devuelve: (fecha, salon, turno) o None si se cancela.
     """
-    # Derivar título de la función de interfaz
-    encabezado = (mostrar_interfaz_evento.__name__
-                 .replace("interfaz_", "")
-                 .replace("_", " ")
-                 .upper())
 
-    # --- Pantalla 1: selección de fecha ---
-    fechas = sorted({evt[0] for evt in eventos_calendar})
-    if not fechas:
-        print("No hay eventos cargados.")
+    if not calendario:
+        print("No hay eventos registrados en el calendario.")
         return None
 
-    opciones_fechas = [f"{i}) {f}" for i, f in enumerate(fechas, start=1)]
-    opciones_fechas.append("0) Salir")
-    imprimir_bloque(encabezado, opciones_fechas, min_width=48, separar_ultimo=True)
+    # Paso 1: Mostrar fechas disponibles
+    lista_fechas = sorted(set(clave_evento[0] for clave_evento in calendario))
+    print("\nFechas disponibles:")
+    for indice, fecha in enumerate(lista_fechas, 1):
+        print(f"{indice}) {fecha}")
+    print("0) Cancelar")
 
-    # Lectura de la elección
     while True:
-        ent = input(f"Elija fecha (0-{len(fechas)}): ").strip()
-        if ent == "0":
+        entrada = input(f"Seleccione una fecha (1-{len(lista_fechas)}): ").strip()
+        if entrada == "0":
             return None
-        if ent.isdigit() and 1 <= int(ent) <= len(fechas):
-            fecha_sel = fechas[int(ent) - 1]
+        if entrada.isdigit() and 1 <= int(entrada) <= len(lista_fechas):
+            fecha_seleccionada = lista_fechas[int(entrada) - 1]
             break
         print("Opción inválida. Intente nuevamente.")
 
-    # --- Pantalla 2: selección de salón y turno ---
-    eventos_en_fecha = [e for e in eventos_calendar if e[0] == fecha_sel]
-    opciones_eventos = [
-        f"{i}) Salón {sal} – Turno {tur}"
-        for i, (_, sal, tur) in enumerate(eventos_en_fecha, start=1)
-    ]
-    opciones_eventos.append("0) Salir")
-    imprimir_bloque(encabezado, opciones_eventos, min_width=48, separar_ultimo=True)
+    # Paso 2: Mostrar salones disponibles para esa fecha
+    lista_salones = sorted(set(clave_evento[1] for clave_evento in calendario if clave_evento[0] == fecha_seleccionada))
+    print(f"\nSalones disponibles para {fecha_seleccionada}:")
+    for indice, salon in enumerate(lista_salones, 1):
+        print(f"{indice}) {salon}")
+    print("0) Cancelar")
 
-    # Lectura de la elección de evento
     while True:
-        ent = input(f"Elija evento (0-{len(eventos_en_fecha)}): ").strip()
-        if ent == "0":
+        entrada = input(f"Seleccione un salón (1-{len(lista_salones)}): ").strip()
+        if entrada == "0":
             return None
-        if ent.isdigit() and 1 <= int(ent) <= len(eventos_en_fecha):
-            _, salon_sel, turno_sel = eventos_en_fecha[int(ent) - 1]
+        if entrada.isdigit() and 1 <= int(entrada) <= len(lista_salones):
+            salon_seleccionado = lista_salones[int(entrada) - 1]
             break
         print("Opción inválida. Intente nuevamente.")
 
-    return fecha_sel, salon_sel, turno_sel
+    # Paso 3: Mostrar turnos disponibles para esa fecha y salón
+    lista_turnos = sorted(set(clave_evento[2] for clave_evento in calendario if clave_evento[0] == fecha_seleccionada and clave_evento[1] == salon_seleccionado))
+    print(f"\nTurnos disponibles para {salon_seleccionado} el {fecha_seleccionada}:")
+    for indice, turno in enumerate(lista_turnos, 1):
+        print(f"{indice}) {turno}")
+    print("0) Cancelar")
 
+    while True:
+        entrada = input(f"Seleccione un turno (1-{len(lista_turnos)}): ").strip()
+        if entrada == "0":
+            return None
+        if entrada.isdigit() and 1 <= int(entrada) <= len(lista_turnos):
+            turno_seleccionado = lista_turnos[int(entrada) - 1]
+            break
+        print("Opción inválida. Intente nuevamente.")
 
-
-#===================================================================================================================================
+    return (fecha_seleccionada, salon_seleccionado, turno_seleccionado)
 ##################################  PROGRAMA PRINCIPAL ###########################################
-#Creamos el diccionario Calendario
-calendario = {}
-#Creamos el diccionario con los servicios estaticos disponibles
-servicios_disponibles = {
-    "DJ":                        PRECIO_DJ,
-    "Fotógrafo":                 PRECIO_FOTOGRAFO,
-    "Decoración básica":         PRECIO_DECORACION_BASE,
-    "Transporte":                PRECIO_TRANSPORTE ,
-    "Pack sonido e iluminación": PRECIO_SOUND_LIGHTS
-}
-
-#===================================================================================================================================
 # Mientras la opción sea distinta de 6 (Salir)
 while True:
     interfaz_bienvenida_gestor_eventos()
@@ -682,9 +668,8 @@ while True:
         else:
             print("No hay eventos cargados en el calendario.")
     elif opcion == "3": # ---------------- ELIMINAR UN EVENTO ---------------------
-        seleccion_evento = obtener_fecha_salon_y_turno(calendario, interfaz_eliminar_evento)
-        if seleccion_evento:
-            eliminarEvento(calendario, *seleccion_evento)
+        interfaz_eliminar_evento()
+        eliminarEvento(calendario)
     elif opcion == "4": # ---------------- IMPRIMIR EL CALENDARIO ---------------------
         interfaz_mostrar_calendario()
         while True:
@@ -695,10 +680,9 @@ while True:
             print("Ingrese un año válido (ej: 2025).")
         mostrarCalendario(año, calendario)
     elif opcion == "5": # ---------------- BUSCAR UN EVENTO ---------------------
-        seleccion_evento = obtener_fecha_salon_y_turno(calendario, interfaz_buscar_evento)
-        if seleccion_evento:
-            buscarEvento(calendario, *seleccion_evento)
-            
+        interfaz_buscar_evento()
+        buscarEvento(calendario)
+           
     elif opcion == "6": # ---------------- SALIR DEL PROGRAMA ---------------------
         interfaz_salir_gestor_eventos()
         interfaz_salir_programa()

@@ -398,7 +398,7 @@ def eliminarEvento(calendario):
     print(f"Eliminando evento de '{cliente}' el {fecha} en Salón {salon}, Turno {turno}.")
 
 #===================================================================================================================================
-def traerDeArchivoLosServicios():
+def traerDeArchivoLosServicios():#***
     servicios = {}
     try:
         archivo = open("servicios.csv", "rt")
@@ -508,7 +508,7 @@ def imprimir_eventos(calendario):
     print("════════════════════════════════════════════════════════════════════")
 
 #===================================================================================================================================
-def seleccionar_tipo_evento():
+def seleccionar_tipo_evento():#***
     """
     Muestra un menú para seleccionar el tipo de evento.
     Devuelve el nombre del evento seleccionado o None si se cancela.
@@ -524,7 +524,7 @@ def seleccionar_tipo_evento():
             return tipos_evento[int(opcion) - 1]
         print("Opción inválida. Intente nuevamente.")
         
-def seleccionar_salon():
+def seleccionar_salon():#***
     """
     Muestra un menú para seleccionar un salón.
     Devuelve el nombre del salón seleccionado o None si se cancela.
@@ -540,7 +540,7 @@ def seleccionar_salon():
             return SALONES[int(opcion) - 1]
         print("Opción inválida. Intente nuevamente.")
 
-def seleccionar_turno():
+def seleccionar_turno(): #***
     """
     Muestra un menú para seleccionar un turno.
     Devuelve el nombre del turno seleccionado o None si se cancela.

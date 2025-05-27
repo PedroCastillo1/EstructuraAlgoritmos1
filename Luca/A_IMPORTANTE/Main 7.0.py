@@ -270,7 +270,9 @@ def guardar_eventos_en_csv():
             cliente = evento["cliente"]
             tipoevento = evento["tipo"]
             cantpersonas = evento["cant_personas"]
-            linea = f"{fecha},{salon},{turno},{cliente},{tipoevento},{cantpersonas}\n"
+            servicios = evento["servicios"]
+            precios = evento["precios"]
+            linea = f"{fecha},{salon},{turno},{cliente},{tipoevento},{cantpersonas},{servicios},{precios}\n"
             arch.write(linea)
     except OSError as mensaje:
         print("No se puede grabar el archivo de eventos:", mensaje)

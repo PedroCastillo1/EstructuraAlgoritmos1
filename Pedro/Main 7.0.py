@@ -234,19 +234,21 @@ def guardar_en_json(nombre_archivo, diccionario):
         except NameError:
             pass
 #========================================= ZONA DE FUNCIONES GESTOR DE USUARIO ====================================================
-def crear_cuenta():
+def crear_cuenta(usuarios):
     Interfaz_CrearCuenta()
     nuevo = input("Ingrese nombre del nuevo usuario: ")
     if nuevo in usuarios:
         print("Ese nombre ya está en uso.")
-        return
+        return usuarios
+
     clave = input("Ingrese contraseña del nuevo usuario: ")
     usuarios[nuevo] = {"contraseña": clave, "rol": "usuario"}
     print("Cuenta creada exitosamente.")
     registrar_auditoria("admin", f"Creó cuenta para {nuevo}")
-    guardar_en_json(USUARIOS,usuarios)
+    guardar_en_json(USUARIOS, usuarios)
+    return usuarios
 #==================================================================================================#    
-def imprimir_usuarios():
+def imprimir_usuarios(usuarios):
     """Muestra la lista de usuarios y oculta la contraseña."""
     Interfaz_ImprimirUsuarios()
     for nombre in sorted(usuarios):
@@ -254,7 +256,7 @@ def imprimir_usuarios():
         rol = usuarios[nombre]["rol"]
         print(f"Usuario: {nombre:<15} | Contraseña: {'*' * len(clave):<10} | Rol: {rol}")
 #==================================================================================================#     
-def buscar_usuario():
+def buscar_usuario(usuarios):
     """Permite buscar si un usuario existe en el sistema."""
     Interfaz_BuscarUsuario()
     try:
@@ -266,19 +268,21 @@ def buscar_usuario():
     except Exception as e:
         print(f"Error al buscar usuario: {str(e)}")
 #==================================================================================================#        
-def eliminar_cuenta():
+def eliminar_cuenta(usuarios):
     Interfaz_EliminarCuenta()
     nombre = input("Ingrese el nombre del usuario que desea eliminar: ")
     if nombre == "admin":
         print("No se puede eliminar el usuario administrador.")
-        return
+        return usuarios
+
     if nombre in usuarios:
         usuarios.pop(nombre)
         print("Usuario eliminado correctamente.")
         registrar_auditoria("admin", f"Eliminó cuenta de {nombre}")
-        guardar_en_json(USUARIOS,usuarios)
+        guardar_en_json(USUARIOS, usuarios)
     else:
         print("El usuario no existe.")
+    return usuarios
 #=================================================== ZONA DE AUDITORIA ===========================================================
 def registrar_auditoria(usuario, accion):
     """
@@ -367,19 +371,19 @@ def modificar_datos_personales(usuario):
     except Exception as e:
         print(f"Error inesperado: {str(e)}")
 #=================================================== ZONA DE MENU ADMIN ===========================================================
-def menu_admin():
+def menu_admin(usuarios):
     while True:
         Interfaz_MenuAdministrador()
         try:
             opcion = input("Seleccione una opción: ")
             if opcion == "1":
-                crear_cuenta()
+                usuarios = crear_cuenta(usuarios)
             elif opcion == "2":
-                eliminar_cuenta()
+                usuarios = eliminar_cuenta(usuarios)
             elif opcion == "3":
-                imprimir_usuarios()
+                imprimir_usuarios(usuarios)
             elif opcion == "4":
-                buscar_usuario()
+                buscar_usuario(usuarios)
             elif opcion == "5":
                 ver_auditoria()
             elif opcion == "6":
@@ -390,6 +394,7 @@ def menu_admin():
                 print("Opción inválida.")
         except Exception as e:
             print("Error inesperado:", e)
+    return usuarios
 #=================================================== ZONA DE MENU USUARIO ===========================================================
 def menu_usuario(nombre,calendario):
     while True:
@@ -978,7 +983,7 @@ def programaPrincipal(usuarios, calendario):
                 usuario_actual = iniciar_sesion(usuarios)
                 if usuario_actual:
                     if usuarios[usuario_actual]["rol"] == "admin":
-                        menu_admin()
+                        usuarios = menu_admin(usuarios)
                     else:
                         menu_usuario(usuario_actual,calendario)
             elif entrada == "-1":

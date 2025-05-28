@@ -1,0 +1,4 @@
+2025-05-28,18:37:32,admin,Inicio de sesión
+2025-05-28,18:37:37,admin,Creó cuenta para luca
+2025-05-28,18:37:39,admin,Cerró sesión
+2025-05-28,18:37:42,luca,Inicio de sesión

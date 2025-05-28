@@ -190,78 +190,7 @@ def interfaz_tipo_turno():
     print("=========================================================================================================")
     print("|                             0. Cancelar                                                               |")
     print("=========================================================================================================")
-#=================================================== ZONA DE CSV ==================================================================
-def cargar_desde_csv(archivoCsv, atributos,diccionarioAGuardar,tamañoClave):#***
-    """
-    Carga los usuarios desde el archivo usuarios.csv al diccionario usuarios.
-    Si el archivo no existe, arranca con un admin por defecto.
-    """
-    try:
-        archivo = open(archivoCsv, "rt")
-        clave = []
-        for linea in archivo:
-                partes = linea.strip().split(",")
-                if len(partes) == len(atributos):
-                    if tamañoClave == 1:
-                        clave = partes[0]
-                    else:
-                        clave = tuple(partes[:tamañoClave])
-                    valor = {atributos[i]: partes[i] for i in range(tamañoClave, len(atributos))}
-                    diccionarioAGuardar[clave] = valor
-    except FileNotFoundError:
-        print("Archivo de usuarios no encontrado. Se creará con usuario admin por defecto.")
-        usuarios["admin"] = {"contraseña": "1234", "rol": "admin"}
-    except OSError as mensaje:
-        print("Error al cargar usuarios:", mensaje)
-    finally:
-        try:
-            archivo.close()
-        except NameError:
-            pass
-#==================================================================================================#
-def guardar_usuarios_en_csv():
-    """
-    Guarda el contenido actual del diccionario usuarios en el archivo usuarios.csv.
-    Sobrescribe el archivo completo.
-    """
-    try:
-        archivo = open("usuarios.csv", "wt")
-        for nombre, datos in usuarios.items():
-            linea = f"{nombre},{datos['contraseña']},{datos['rol']}\n"
-            archivo.write(linea)
-    except OSError as mensaje:
-        print("No se puede guardar el archivo de usuarios:", mensaje)
-    finally:
-        try:
-            archivo.close()
-        except NameError:
-            pass 
-#==================================================================================================# 
-#==================================================================================================#
-def guardar_eventos_en_csv():#***
-    """
-    Guarda el contenido actual del diccionario eventos en el archivo eventos.csv.
-    Sobrescribe el archivo completo.
-    """
-    try:
-        arch = open("eventos.csv", "wt")  # 'w' sobrescribe, 't' texto
-        for clave, evento in calendario.items():
-            fecha, salon, turno = clave
-            cliente = evento["cliente"]
-            tipoevento = evento["tipo"]
-            cantpersonas = evento["cant_personas"]
-            servicios = evento["servicios"]
-            precios = evento["precios"]
-            linea = f"{fecha},{salon},{turno},{cliente},{tipoevento},{cantpersonas},{servicios},{precios}\n"
-            arch.write(linea)
-    except OSError as mensaje:
-        print("No se puede grabar el archivo de eventos:", mensaje)
-    finally:
-        try:
-            arch.close()
-        except NameError:
-            pass
-
+#=================================================== ZONA DE JSON ==================================================================
 def cargar_desde_json(nombre_archivo):
     try:
         archivo = open(nombre_archivo, "r", encoding="utf-8")
@@ -393,7 +322,7 @@ def ver_auditoria():
         except NameError:
             pass
 #=================================================== ZONA DE FUNCION INICIO DE SESION ===========================================================
-def iniciar_sesion():
+def iniciar_sesion(usuarios):
     """Solicita credenciales y valida contra el diccionario de usuarios. Devuelve el nombre del usuario si es válido."""
     intentos = 0
     while intentos < 3:
@@ -462,7 +391,7 @@ def menu_admin():
         except Exception as e:
             print("Error inesperado:", e)
 #=================================================== ZONA DE MENU USUARIO ===========================================================
-def menu_usuario(nombre):
+def menu_usuario(nombre,calendario):
     while True:
         Interfaz_MenuUsuario()
         try:
@@ -470,7 +399,7 @@ def menu_usuario(nombre):
             if opcion == "1":
                 modificar_datos_personales(nombre)
             elif opcion == "2":
-                menu_eventos(nombre)
+                menu_eventos(nombre,calendario)
             elif opcion == "3":
                 print("Cierre de sesión del usuario.")
                 registrar_auditoria(nombre, "Cerró sesión")
@@ -480,7 +409,7 @@ def menu_usuario(nombre):
         except Exception as e:
             print("Error inesperado:", e)
 #=================================================== ZONA DE MENU EVENTOS ===========================================================
-def menu_eventos(usuario):
+def menu_eventos(usuario,calendario):
     while True:
         Interfaz_MenuEvento()
         opcion = input("Seleccione una opción (1-6): ").strip()
@@ -555,7 +484,7 @@ def agregar_evento(usuario,calendario, servicios_disponibles):
             return
 
         # 6) Turno
-        interfaz_tipo_turno
+        interfaz_tipo_turno()
         turno = seleccionar_opciones(TURNOS)
         if turno is None:
             return
@@ -712,7 +641,7 @@ def eliminar_evento(usuario,calendario):
 
         print("Evento eliminado correctamente.")
         registrar_auditoria(usuario, f"Eliminó un evento en {salon} el {fecha} - {turno}")
-        guardar_eventos_en_csv()
+        guardar_en_json(EVENTOS,calendario)
     except Exception as e:
         print("Error al eliminar el evento:", e)
 #===================================================================================================================================
@@ -1036,9 +965,7 @@ def mostrarCalendario(año, eventos):
         # Imprime una línea en blanco al terminar cada mes.
         print()
 #===================================================================================================================================
-def main():
-    global usuarios
-    global calendario 
+def programaPrincipal(usuarios, calendario):
     usuarios = cargar_desde_json("usuarios.json")
     if len(usuarios) == 0:
         usuarios["admin"] = {"contraseña": "1234", "rol": "admin"}
@@ -1048,12 +975,12 @@ def main():
         try:
             entrada = input("Ingrese una opción: ")
             if entrada == "1":
-                usuario_actual = iniciar_sesion()
+                usuario_actual = iniciar_sesion(usuarios)
                 if usuario_actual:
                     if usuarios[usuario_actual]["rol"] == "admin":
                         menu_admin()
                     else:
-                        menu_usuario(usuario_actual)
+                        menu_usuario(usuario_actual,calendario)
             elif entrada == "-1":
                 print("USTED HA FINALIZADO EL PROGRAMA. HASTA LUEGO.")
                 break
@@ -1064,4 +991,4 @@ def main():
 
 
 ## PROGRAMA PRINCIPAL ##
-main()
+programaPrincipal(usuarios,calendario)

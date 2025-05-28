@@ -1,5 +1,6 @@
 from datetime import datetime
 import math
+import json
 
 # — Constantes —
 PRECIO_CATERING_BASIC    = 2500
@@ -17,8 +18,8 @@ PRECIO_FOTOGRAFO   = 20000
 SALONES = ["Palermo","Puerto Madero","Nordelta","San Telmo","Recoleta"]
 TURNOS  = ["Mañana","Tarde","Noche"]
 TIPOS_DE_EVENTOS = ["Fiesta de egresados","Casamiento","Cumple de XV","Despedida de soltero","Evento empresarial","Conferencia"]
-USUARIOS = "usuarios.csv"
-EVENTOS = "eventos.csv"
+USUARIOS = "usuarios.json"
+EVENTOS = "eventos.json"
 
 # Estructura actualizada: diccionario con contraseña y rol
 usuarios = {
@@ -251,13 +252,56 @@ def guardar_eventos_en_csv():#***
             cantpersonas = evento["cant_personas"]
             servicios = evento["servicios"]
             precios = evento["precios"]
-            linea = f"{fecha},{salon},{turno},{cliente},{tipoevento},{cantpersonas},{servicios}{precios}\n"
+            linea = f"{fecha},{salon},{turno},{cliente},{tipoevento},{cantpersonas},{servicios},{precios}\n"
             arch.write(linea)
     except OSError as mensaje:
         print("No se puede grabar el archivo de eventos:", mensaje)
     finally:
         try:
             arch.close()
+        except NameError:
+            pass
+
+def cargar_desde_json(nombre_archivo):
+    try:
+        archivo = open(nombre_archivo, "r", encoding="utf-8")
+        datos = json.load(archivo)
+        reconstruido = {}
+        for k, v in datos.items():
+            try:
+                clave = json.loads(k)
+                if isinstance(clave, list):
+                    clave = tuple(clave)
+                reconstruido[clave] = v
+            except json.JSONDecodeError:
+                # Si la clave no era una lista JSON válida, se deja como string
+                reconstruido[k] = v
+        return reconstruido
+    except FileNotFoundError:
+        print(f"Archivo '{nombre_archivo}' no encontrado. Se usará un diccionario vacío.")
+        return {}
+    except json.JSONDecodeError as error:
+        print(f"Error al decodificar JSON en '{nombre_archivo}':", error)
+        return {}
+    except OSError as error:
+        print(f"Error al leer {nombre_archivo}:", error)
+        return {}
+    finally:
+        try:
+            archivo.close()
+        except NameError:
+            pass
+
+def guardar_en_json(nombre_archivo, diccionario):
+    try:
+        archivo = open(nombre_archivo, "w", encoding="utf-8")
+        serializado = {json.dumps(k) if isinstance(k, tuple) else k: v for k, v in diccionario.items()}
+        json.dump(serializado, archivo)
+    except OSError as error:
+        print(f"No se pudo guardar en {nombre_archivo}:", error)
+    finally:
+        try:
+            archivo.close()
         except NameError:
             pass
 #========================================= ZONA DE FUNCIONES GESTOR DE USUARIO ====================================================
@@ -271,7 +315,7 @@ def crear_cuenta():
     usuarios[nuevo] = {"contraseña": clave, "rol": "usuario"}
     print("Cuenta creada exitosamente.")
     registrar_auditoria("admin", f"Creó cuenta para {nuevo}")
-    guardar_usuarios_en_csv()
+    guardar_en_json(USUARIOS,usuarios)
 #==================================================================================================#    
 def imprimir_usuarios():
     """Muestra la lista de usuarios y oculta la contraseña."""
@@ -303,7 +347,7 @@ def eliminar_cuenta():
         usuarios.pop(nombre)
         print("Usuario eliminado correctamente.")
         registrar_auditoria("admin", f"Eliminó cuenta de {nombre}")
-        guardar_usuarios_en_csv()
+        guardar_en_json(USUARIOS,usuarios)
     else:
         print("El usuario no existe.")
 #=================================================== ZONA DE AUDITORIA ===========================================================
@@ -387,7 +431,7 @@ def modificar_datos_personales(usuario):
         usuarios[usuario]["contraseña"] = nueva
         print("Contraseña actualizada correctamente.")
         registrar_auditoria(usuario, "Modificó su contraseña")
-        guardar_usuarios_en_csv()
+        guardar_en_json(USUARIOS,usuarios)
 
     except KeyError:
         print("Error al acceder a los datos del usuario.")
@@ -542,7 +586,7 @@ def agregar_evento(usuario,calendario, servicios_disponibles):
         servicios, precios = seleccionar_servicios(servicios_evento)
         subtotal = sum(precios)
         limpieza = subtotal * PORCENTAJE_LIMPIEZA
-        servicios.append("Limpieza post-evento (5%)")
+        servicios.append("Limpieza postevento")
         precios.append(limpieza)
 
         # 10) Registrar y mostrar evento
@@ -551,7 +595,7 @@ def agregar_evento(usuario,calendario, servicios_disponibles):
         imprimirEvento((fecha, salon, turno), evento)
 
         registrar_auditoria(usuario, f"Agregó un evento en {salon} el {fecha} - {turno}")
-        guardar_eventos_en_csv()
+        guardar_en_json(EVENTOS,calendario)
 
     except Exception as e:
         print("Error al crear el evento:", e)
@@ -993,8 +1037,12 @@ def mostrarCalendario(año, eventos):
         print()
 #===================================================================================================================================
 def main():
-    cargar_desde_csv(USUARIOS,["nombre","contraseña","rol"],usuarios,1)
-    cargar_desde_csv(EVENTOS,["fecha", "salon", "turno","cliente","tipo_de_evento","cant_personas","servicios","precios"],calendario,3)
+    global usuarios
+    global calendario 
+    usuarios = cargar_desde_json("usuarios.json")
+    if len(usuarios) == 0:
+        usuarios["admin"] = {"contraseña": "1234", "rol": "admin"}
+    calendario = cargar_desde_json("eventos.json")
     while True:
         menu_interactivo()
         try:

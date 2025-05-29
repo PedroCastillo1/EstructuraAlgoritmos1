@@ -1,0 +1,37 @@
+{
+            "Catering Básico": {
+                "precio": 2500,
+                "tipo": "variable"
+            },
+            "Catering Estándar": {
+                "precio": 3500,
+                "tipo": "variable"
+            },
+            "Catering Premium": {
+                "precio": 5000,
+                "tipo": "variable"
+            },
+            
+            "Bartender": {
+                "precio": 25000,
+                "tipo": "fija"
+            },
+            
+            "Decoración básica": {
+                "precio": 80000,
+                "tipo": "fija"
+            },
+            
+            "Pack sonido e iluminación": {
+                "precio": 80000,
+                "tipo": "fija"
+            },
+            "DJ": {
+                "precio": 50000,
+                "tipo": "fija"
+            },
+            "Fotógrafo": {
+                "precio": 20000,
+                "tipo": "fija"
+            }
+        }

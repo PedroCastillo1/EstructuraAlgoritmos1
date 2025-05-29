@@ -1,25 +1,14 @@
 from datetime import datetime
-import math
 import json
 
 # — Constantes —
-PRECIO_CATERING_BASIC    = 2500
-PRECIO_CATERING_STD      = 3500
-PRECIO_CATERING_PREMIUM  = 5000
-PRECIO_MOSO              = 20000
-PRECIO_BARTENDER         = 25000
-PRECIO_SEGURIDAD         = 22000
-PRECIO_DECORACION_BASE   = 80000
-PORCENTAJE_LIMPIEZA      = 0.05
-PRECIO_TRANSPORTE          = 50000
-PRECIO_SOUND_LIGHTS      = 80000
-PRECIO_DJ          = 50000
-PRECIO_FOTOGRAFO   = 20000
 SALONES = ["Palermo","Puerto Madero","Nordelta","San Telmo","Recoleta"]
 TURNOS  = ["Mañana","Tarde","Noche"]
 TIPOS_DE_EVENTOS = ["Fiesta de egresados","Casamiento","Cumple de XV","Despedida de soltero","Evento empresarial","Conferencia"]
 USUARIOS = "usuarios.json"
 EVENTOS = "eventos.json"
+SERVICIOS = "servicios.json"
+
 
 # Estructura actualizada: diccionario con contraseña y rol
 usuarios = {
@@ -31,11 +20,6 @@ calendario = {}
 
 #Creamos el diccionario con los servicios estaticos disponibles
 servicios_disponibles = {
-    "DJ":                        PRECIO_DJ,
-    "Fotógrafo":                 PRECIO_FOTOGRAFO,
-    "Decoración básica":         PRECIO_DECORACION_BASE,
-    "Transporte":                PRECIO_TRANSPORTE ,
-    "Pack sonido e iluminación": PRECIO_SOUND_LIGHTS
 }
 
 # — Capacidades máximas por salón (entre 20 y 1000) —
@@ -396,7 +380,7 @@ def menu_admin(usuarios):
             print("Error inesperado:", e)
     return usuarios
 #=================================================== ZONA DE MENU USUARIO ===========================================================
-def menu_usuario(nombre,calendario):
+def menu_usuario(nombre,calendario,servicios_disponibles):
     while True:
         Interfaz_MenuUsuario()
         try:
@@ -404,7 +388,7 @@ def menu_usuario(nombre,calendario):
             if opcion == "1":
                 modificar_datos_personales(nombre)
             elif opcion == "2":
-                menu_eventos(nombre,calendario)
+                menu_eventos(nombre,calendario,servicios_disponibles)
             elif opcion == "3":
                 print("Cierre de sesión del usuario.")
                 registrar_auditoria(nombre, "Cerró sesión")
@@ -414,7 +398,7 @@ def menu_usuario(nombre,calendario):
         except Exception as e:
             print("Error inesperado:", e)
 #=================================================== ZONA DE MENU EVENTOS ===========================================================
-def menu_eventos(usuario,calendario):
+def menu_eventos(usuario,calendario,servicios_disponibles):
     while True:
         Interfaz_MenuEvento()
         opcion = input("Seleccione una opción (1-6): ").strip()
@@ -505,21 +489,20 @@ def agregar_evento(usuario,calendario, servicios_disponibles):
             print("Entrada inválida.")
 
         # 8) Construir servicios
+        #Definimos los precios de los servicios variables dependiendo de la gente del evento sin math utilizando los servicios disponibles
+        #El diccionario servicios_disponibles contiene los servicios y sus precios y su tipo fijo o variable sin math.ceil
         servicios_evento = servicios_disponibles.copy()
-        servicios_evento[f"Catering Básico   ({cant}×)"]   = PRECIO_CATERING_BASIC   * cant
-        servicios_evento[f"Catering Estándar ({cant}×)"]   = PRECIO_CATERING_STD     * cant
-        servicios_evento[f"Catering Premium  ({cant}×)"]   = PRECIO_CATERING_PREMIUM * cant
-        m = math.ceil(cant / 4)
-        servicios_evento[f"Moso x{m}"]      = PRECIO_MOSO      * m
-        b = math.ceil(cant / 20)
-        servicios_evento[f"Bartender x{b}"] = PRECIO_BARTENDER * b
-        g = math.ceil(cant / 30)
-        servicios_evento[f"Guardia x{g}"]   = PRECIO_SEGURIDAD * g
-
+        for servicio, precio in servicios_evento.items():
+            if precio["tipo"] == "variable":
+                # Calcula el precio variable según la cantidad de personas
+                servicios_evento[servicio] = precio["precio"] * cant
+            else:
+                # Mantiene el precio fijo
+                servicios_evento[servicio] = precio["precio"]
         # 9) Selección de servicios
         servicios, precios = seleccionar_servicios(servicios_evento)
         subtotal = sum(precios)
-        limpieza = subtotal * PORCENTAJE_LIMPIEZA
+        limpieza = subtotal * 0.05
         servicios.append("Limpieza postevento")
         precios.append(limpieza)
 
@@ -970,11 +953,12 @@ def mostrarCalendario(año, eventos):
         # Imprime una línea en blanco al terminar cada mes.
         print()
 #===================================================================================================================================
-def programaPrincipal(usuarios, calendario):
+def programaPrincipal(usuarios, calendario,servicios_disponibles):
     usuarios = cargar_desde_json("usuarios.json")
     if len(usuarios) == 0:
         usuarios["admin"] = {"contraseña": "1234", "rol": "admin"}
     calendario = cargar_desde_json("eventos.json")
+    servicios_disponibles = cargar_desde_json("servicios.json")
     while True:
         menu_interactivo()
         try:
@@ -985,7 +969,7 @@ def programaPrincipal(usuarios, calendario):
                     if usuarios[usuario_actual]["rol"] == "admin":
                         usuarios = menu_admin(usuarios)
                     else:
-                        menu_usuario(usuario_actual,calendario)
+                        menu_usuario(usuario_actual,calendario,servicios_disponibles)
             elif entrada == "-1":
                 print("USTED HA FINALIZADO EL PROGRAMA. HASTA LUEGO.")
                 break
@@ -996,4 +980,4 @@ def programaPrincipal(usuarios, calendario):
 
 
 ## PROGRAMA PRINCIPAL ##
-programaPrincipal(usuarios,calendario)
+programaPrincipal(usuarios,calendario,servicios_disponibles)

@@ -330,11 +330,11 @@ def iniciar_sesion(usuarios):
     print("Demasiados intentos fallidos. Sesión bloqueada.")
     return None
 #======================================== ZONA DE FUNCION MODIFICAR DATOS PERSONALES ==================================================
-def modificar_datos_personales(usuario):
+def modificar_datos_personales(nombre,usuarios):
     Interfaz_ModificarDatos()
     try:
         actual = input("Ingrese su contraseña actual: ")
-        if usuarios[usuario]["contraseña"] != actual:
+        if usuarios[nombre]["contraseña"] != actual:
             print("Contraseña incorrecta. No se realizaron cambios.")
             return
 
@@ -345,9 +345,9 @@ def modificar_datos_personales(usuario):
             print("Las contraseñas no coinciden. Intente nuevamente.")
             return
 
-        usuarios[usuario]["contraseña"] = nueva
+        usuarios[nombre]["contraseña"] = nueva
         print("Contraseña actualizada correctamente.")
-        registrar_auditoria(usuario, "Modificó su contraseña")
+        registrar_auditoria(nombre, "Modificó su contraseña")
         guardar_en_json(USUARIOS,usuarios)
 
     except KeyError:
@@ -380,13 +380,13 @@ def menu_admin(usuarios):
             print("Error inesperado:", e)
     return usuarios
 #=================================================== ZONA DE MENU USUARIO ===========================================================
-def menu_usuario(nombre,calendario,servicios_disponibles):
+def menu_usuario(nombre,calendario,usuarios,servicios_disponibles):
     while True:
         Interfaz_MenuUsuario()
         try:
             opcion = input("Seleccione una opción: ")
             if opcion == "1":
-                modificar_datos_personales(nombre)
+                modificar_datos_personales(nombre,usuarios)
             elif opcion == "2":
                 menu_eventos(nombre,calendario,servicios_disponibles)
             elif opcion == "3":
@@ -969,7 +969,7 @@ def programaPrincipal(usuarios, calendario,servicios_disponibles):
                     if usuarios[usuario_actual]["rol"] == "admin":
                         usuarios = menu_admin(usuarios)
                     else:
-                        menu_usuario(usuario_actual,calendario,servicios_disponibles)
+                        menu_usuario(usuario_actual,calendario,usuarios,servicios_disponibles)
             elif entrada == "-1":
                 print("USTED HA FINALIZADO EL PROGRAMA. HASTA LUEGO.")
                 break

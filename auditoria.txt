@@ -2,3 +2,22 @@
 2025-05-28,18:37:37,admin,Creó cuenta para luca
 2025-05-28,18:37:39,admin,Cerró sesión
 2025-05-28,18:37:42,luca,Inicio de sesión
+2025-05-29,00:11:14,luca,Inicio de sesión
+2025-05-29,00:11:50,luca,Agregó un evento en Palermo el 2020-06-06 - Mañana
+2025-05-29,00:12:18,luca,Agregó un evento en Nordelta el 2020-06-07 - Tarde
+2025-05-29,00:12:38,luca,Agregó un evento en Nordelta el 2020-06-08 - Tarde
+2025-05-29,00:13:00,luca,Agregó un evento en Palermo el 2020-06-09 - Mañana
+2025-05-29,00:13:46,luca,Cerró sesión
+2025-05-29,00:13:58,luca,Inicio de sesión
+2025-05-29,00:19:15,luca,Inicio de sesión
+2025-05-29,00:19:23,luca,Modificó su contraseña
+2025-05-29,00:19:32,luca,Modificó su contraseña
+2025-05-29,00:19:34,luca,Cerró sesión
+2025-05-29,00:19:38,admin,Inicio de sesión
+2025-05-29,00:20:25,admin,Cerró sesión
+2025-05-29,00:22:20,admin,Inicio de sesión
+2025-05-29,00:22:25,admin,Creó cuenta para pepe
+2025-05-29,00:22:33,admin,Creó cuenta para kaka
+2025-05-29,00:22:37,admin,Cerró sesión
+2025-05-29,00:22:47,admin,Inicio de sesión
+2025-05-29,00:23:17,admin,Cerró sesión

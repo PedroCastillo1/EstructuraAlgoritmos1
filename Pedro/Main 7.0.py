@@ -176,76 +176,93 @@ def interfaz_tipo_turno():
     print("=========================================================================================================")
 #=================================================== ZONA DE JSON ==================================================================
 def cargar_desde_json(nombre_archivo):
+    """
+        Intenta abrir y procesar un archivo JSON
+    """
     try:
-        archivo = open(nombre_archivo, "r", encoding="utf-8")
-        datos = json.load(archivo)
-        reconstruido = {}
-        for k, v in datos.items():
+        archivo = open(nombre_archivo, "r") # Abre el archivo en modo lectura ("r")
+        datos = json.load(archivo) # Carga el contenido JSON del archivo
+        reconstruido = {} # Se crea un nuevo diccionario vacío donde se reconstruirán las claves
+        for k, v in datos.items(): # Recorre cada par clave-valor del diccionario original
             try:
-                clave = json.loads(k)
+                clave = json.loads(k) # Intenta decodificar la clave desde una cadena JSON
                 if isinstance(clave, list):
-                    clave = tuple(clave)
-                reconstruido[clave] = v
-            except json.JSONDecodeError:
-                # Si la clave no era una lista JSON válida, se deja como string
+                    clave = tuple(clave) # Si la clave es una lista, se convierte en tupla (porque las listas no pueden ser claves en diccionarios)
+                reconstruido[clave] = v # Asigna el valor al nuevo diccionario
+            except json.JSONDecodeError: # Si ocurre un error al intentar decodificar la clave (no era JSON válido)
                 reconstruido[k] = v
         return reconstruido
-    except FileNotFoundError:
+    except FileNotFoundError: # Si el archivo no existe
         print(f"Archivo '{nombre_archivo}' no encontrado. Se usará un diccionario vacío.")
         return {}
-    except json.JSONDecodeError as error:
+    except json.JSONDecodeError as error: # Si ocurre un error al decodificar el JSON del archivo
         print(f"Error al decodificar JSON en '{nombre_archivo}':", error)
         return {}
-    except OSError as error:
+    except OSError as error: # Si ocurre cualquier otro error relacionado con el sistema operativo
         print(f"Error al leer {nombre_archivo}:", error)
         return {}
     finally:
         try:
-            archivo.close()
+            archivo.close() # Cierra el archivo
         except NameError:
             pass
 
 def guardar_en_json(nombre_archivo, diccionario):
+    """
+        guarda el contenido del diccionario en un archivo JSON
+    """
     try:
-        archivo = open(nombre_archivo, "w", encoding="utf-8")
+        # Abre el archivo en modo escritura ("w"), Si el archivo ya existe, su contenido será sobrescrito
+        archivo = open(nombre_archivo, "w")
+        # Se crea un nuevo diccionario en el que:
+        #   - Cada clave que sea una tupla se convierte a string JSON con json.dumps (porque JSON no acepta tuplas como claves)
+        #   - Las claves que no sean tuplas se dejan como están
+        #   - Los valores se mantienen sin cambios
         serializado = {json.dumps(k) if isinstance(k, tuple) else k: v for k, v in diccionario.items()}
         json.dump(serializado, archivo)
-    except OSError as error:
+        # Se guarda el diccionario serializado en el archivo en formato JSON
+    except OSError as error: # Si ocurre un error del sistema al intentar abrir o escribir el archivo
         print(f"No se pudo guardar en {nombre_archivo}:", error)
     finally:
         try:
-            archivo.close()
+            archivo.close() # Cierra el archivo
         except NameError:
             pass
 #========================================= ZONA DE FUNCIONES GESTOR DE USUARIO ====================================================
 def crear_cuenta(usuarios):
+    """
+        Función para crear una nueva cuenta de usuario y guardarla
+    """
     Interfaz_CrearCuenta()
-    nuevo = input("Ingrese nombre del nuevo usuario: ")
-    if nuevo in usuarios:
+    nuevo = input("Ingrese nombre del nuevo usuario: ") # Solicita al administrador el nombre del nuevo usuario
+    if nuevo in usuarios: # Verifica si el nombre de usuario ya existe 
         print("Ese nombre ya está en uso.")
         return usuarios
-
-    clave = input("Ingrese contraseña del nuevo usuario: ")
-    usuarios[nuevo] = {"contraseña": clave, "rol": "usuario"}
+    clave = input("Ingrese contraseña del nuevo usuario: ") # Solicita una contraseña para el nuevo usuario
+    usuarios[nuevo] = {"contraseña": clave, "rol": "usuario"} # Agrega el nuevo usuario al diccionario con su contraseña y rol fijo como "usuario"
     print("Cuenta creada exitosamente.")
-    registrar_auditoria("admin", f"Creó cuenta para {nuevo}")
-    guardar_en_json(USUARIOS, usuarios)
-    return usuarios
+    registrar_auditoria("admin", f"Creó cuenta para {nuevo}") # Registra en el historial de auditoría que el administrador creó una nueva cuenta
+    guardar_en_json(USUARIOS, usuarios) # Guarda el diccionario de usuarios actualizado en el archivo JSON
+    return usuarios # Devuelve el diccionario de usuarios actualizado
 #==================================================================================================#    
 def imprimir_usuarios(usuarios):
-    """Muestra la lista de usuarios y oculta la contraseña."""
+    """
+        Muestra la lista de usuarios y oculta la contraseña.
+    """
     Interfaz_ImprimirUsuarios()
-    for nombre in sorted(usuarios):
-        clave = usuarios[nombre]["contraseña"]
-        rol = usuarios[nombre]["rol"]
+    for nombre in sorted(usuarios): # Recorre los nombres de usuarios ordenados alfabéticamente
+        clave = usuarios[nombre]["contraseña"] # Obtiene la contraseña del usuario actual
+        rol = usuarios[nombre]["rol"] # Obtiene el rol del usuario actual
         print(f"Usuario: {nombre:<15} | Contraseña: {'*' * len(clave):<10} | Rol: {rol}")
 #==================================================================================================#     
 def buscar_usuario(usuarios):
-    """Permite buscar si un usuario existe en el sistema."""
+    """
+        Permite buscar si un usuario existe en el sistema.
+    """
     Interfaz_BuscarUsuario()
     try:
         nombre = input("Ingrese el nombre del usuario a buscar: ")
-        if nombre in usuarios:
+        if nombre in usuarios: # Verifica si el nombre ingresado está en el diccionario de usuarios
             print("El usuario existe.")
         else:
             print("El usuario NO existe.")
@@ -253,82 +270,90 @@ def buscar_usuario(usuarios):
         print(f"Error al buscar usuario: {str(e)}")
 #==================================================================================================#        
 def eliminar_cuenta(usuarios):
+    """
+        Función que permite eliminar un usuario del sistema
+    """
     Interfaz_EliminarCuenta()
     nombre = input("Ingrese el nombre del usuario que desea eliminar: ")
     if nombre == "admin":
         print("No se puede eliminar el usuario administrador.")
-        return usuarios
-
-    if nombre in usuarios:
+        return usuarios # Retorna el diccionario sin cambios
+    if nombre in usuarios: # Verifica si el nombre ingresado existe en el diccionario de usuarios
         usuarios.pop(nombre)
         print("Usuario eliminado correctamente.")
-        registrar_auditoria("admin", f"Eliminó cuenta de {nombre}")
-        guardar_en_json(USUARIOS, usuarios)
+        registrar_auditoria("admin", f"Eliminó cuenta de {nombre}") # Registra la acción en el historial de auditoría
+        guardar_en_json(USUARIOS, usuarios) # Guarda el estado actualizado del diccionario de usuarios en el archivo JSON
     else:
         print("El usuario no existe.")
-    return usuarios
+    return usuarios # Retorna el diccionario actualizado (o sin cambios si no se eliminó nadie)
 #=================================================== ZONA DE AUDITORIA ===========================================================
 def registrar_auditoria(usuario, accion):
     """
-    Registra una acción en el archivo de auditoría con fecha y hora.
+        Registra una acción en el archivo de auditoría con fecha y hora.
     
-    Parámetros:
-    usuario (str): Nombre del usuario que realiza la acción.
-    accion (str): Descripción de la acción realizada.
+        Parámetros:
+            usuario (str): Nombre del usuario que realiza la acción.
+            accion (str): Descripción de la acción realizada.
     """
     try:
         arch = open("auditoria.txt", "at")  # 'a' para agregar, 't' para modo texto
-        ahora = datetime.now()
-        fecha = ahora.strftime("%Y-%m-%d")
-        hora = ahora.strftime("%H:%M:%S")
+        # Abre (o crea) el archivo 'auditoria.txt' en modo de agregar texto al final del archivo.
+        # Esto evita sobrescribir el contenido anterior y asegura que cada acción quede registrada.
+        
+        ahora = datetime.now() # Obtiene la fecha y hora actual del sistema
+        fecha = ahora.strftime("%Y-%m-%d") # Formatea la fecha actual en el formato año-mes-día (ej: 2025-06-01)
+        hora = ahora.strftime("%H:%M:%S")  # Formatea la hora actual en formato de 24 horas (ej: 14:30:15)
         linea = f"{fecha},{hora},{usuario},{accion}\n"
-        arch.write(linea)
+        arch.write(linea) # Escribe la línea en el archivo de auditoría
     except OSError as mensaje:
         print("No se puede grabar el archivo:", mensaje)
     finally:
         try:
-            arch.close()
+            arch.close() # Cierra el archivo
         except NameError:
             pass
 #==================================================================================================#
 def ver_auditoria():
     """
-    Muestra el contenido del archivo de auditoría. Solo el administrador accede.
+        Muestra el contenido del archivo de auditoría. Solo el administrador accede.
     """
     Auditoria_interfaz()
     try:
-        archivo = open("auditoria.txt", "rt")
+        archivo = open("auditoria.txt", "rt") # archivo 'auditoria.txt' en modo lectura de texto ('rt').
         for linea in archivo:
-            print(linea.strip())
-    except FileNotFoundError:
+            print(linea.strip()) # Recorre cada línea del archivo y la imprime eliminando espacios en blanco o saltos de línea.
+    except FileNotFoundError: # Captura el error si el archivo no existe.
         print("El archivo de auditoría no existe aún.")
     except OSError as mensaje:
         print("No se pudo abrir el archivo de auditoría:", mensaje)
     finally:
         try:
-            archivo.close()
+            archivo.close() # Cierra el archivo
         except NameError:
             pass
 #=================================================== ZONA DE FUNCION INICIO DE SESION ===========================================================
 def iniciar_sesion(usuarios):
-    """Solicita credenciales y valida contra el diccionario de usuarios. Devuelve el nombre del usuario si es válido."""
-    intentos = 0
-    while intentos < 3:
+    """
+        Esta función permite a un usuario autenticarse ingresando su nombre y contraseña.
+        Si las credenciales son correctas, devuelve el nombre del usuario. Si falla 3 veces, retorna None.
+    """
+    intentos = 0 # contador para llevar el número de intentos fallidos de inicio de sesión.
+    while intentos < 3: # 3 intentos de autenticación.
         try:
             nombre = input("Nombre de usuario: ")
             clave = input("Contraseña: ")
-            if nombre in usuarios and usuarios[nombre]["contraseña"] == clave:
+            if nombre in usuarios and usuarios[nombre]["contraseña"] == clave: # Verifica que el nombre de usuario exista y que la contraseña coincida.
                 print("Inicio de sesión exitoso.")
-                registrar_auditoria(nombre, "Inicio de sesión")
+                registrar_auditoria(nombre, "Inicio de sesión") # Registra la acción de inicio de sesión en el archivo de auditoría.
                 return nombre
             else:
-                intentos += 1
+                intentos += 1 # Si las credenciales son incorrectas, incrementa el contador de intentos.
                 print("Credenciales incorrectas. Intentos restantes:", 3 - intentos)
         except KeyError:
             print("Error al acceder a los datos del usuario.")
-            intentos += 1
+            intentos += 1 # Incrementa el contador de intentos incluso si hubo una excepción.
     print("Demasiados intentos fallidos. Sesión bloqueada.")
-    return None
+    return None # Retorna None indicando que no se pudo iniciar sesión correctamente.
 #======================================== ZONA DE FUNCION MODIFICAR DATOS PERSONALES ==================================================
 def modificar_datos_personales(nombre,usuarios):
     Interfaz_ModificarDatos()

@@ -355,26 +355,26 @@ def iniciar_sesion(usuarios):
     print("Demasiados intentos fallidos. Sesión bloqueada.")
     return None # Retorna None indicando que no se pudo iniciar sesión correctamente.
 #======================================== ZONA DE FUNCION MODIFICAR DATOS PERSONALES ==================================================
-def modificar_datos_personales(nombre,usuarios):
+def modificar_datos_personales(nombre, usuarios):
+    """
+        Esta función permite a un usuario cambiar su contraseña,
+        verificando primero que su contraseña actual sea correcta.
+    """
     Interfaz_ModificarDatos()
     try:
         actual = input("Ingrese su contraseña actual: ")
-        if usuarios[nombre]["contraseña"] != actual:
+        if usuarios[nombre]["contraseña"] != actual: # Compara la contraseña ingresada con la que está registrada en el sistema.
             print("Contraseña incorrecta. No se realizaron cambios.")
             return
-
         nueva = input("Ingrese nueva contraseña: ")
         confirmacion = input("Confirme nueva contraseña: ")
-
-        if nueva != confirmacion:
+        if nueva != confirmacion: # Verifica que ambas contraseñas ingresadas coincidan.
             print("Las contraseñas no coinciden. Intente nuevamente.")
             return
-
-        usuarios[nombre]["contraseña"] = nueva
+        usuarios[nombre]["contraseña"] = nueva # Actualiza la contraseña del usuario en el diccionario.
         print("Contraseña actualizada correctamente.")
-        registrar_auditoria(nombre, "Modificó su contraseña")
-        guardar_en_json(USUARIOS,usuarios)
-
+        registrar_auditoria(nombre, "Modificó su contraseña") # Registra la acción en el archivo de auditoría con la fecha y hora correspondiente.
+        guardar_en_json(USUARIOS, usuarios) # Guarda los cambios en el archivo JSON persistente que contiene los usuarios.
     except KeyError:
         print("Error al acceder a los datos del usuario.")
     except Exception as e:
@@ -385,17 +385,17 @@ def menu_admin(usuarios):
         Interfaz_MenuAdministrador()
         try:
             opcion = input("Seleccione una opción: ")
-            if opcion == "1":
+            if opcion == "1": # ---------------- CREAR CUENTA ---------------------
                 usuarios = crear_cuenta(usuarios)
-            elif opcion == "2":
-                usuarios = eliminar_cuenta(usuarios)
-            elif opcion == "3":
+            elif opcion == "2": # ---------------- ELIMINAR CUENTA ----------------
+                usuarios = eliminar_cuenta(usuarios) 
+            elif opcion == "3": # ---------------- IMPRIMIR CUENTAS ---------------
                 imprimir_usuarios(usuarios)
-            elif opcion == "4":
+            elif opcion == "4": # ---------------- BUSCAR CUENTA ------------------
                 buscar_usuario(usuarios)
-            elif opcion == "5":
+            elif opcion == "5": # ---------------- AUDITORIA ----------------------
                 ver_auditoria()
-            elif opcion == "6":
+            elif opcion == "6": # ---------------- CIERRE CUENTA ------------------
                 print("Cierre de sesión del administrador.")
                 registrar_auditoria("admin", "Cerró sesión")
                 break
@@ -410,11 +410,11 @@ def menu_usuario(nombre,calendario,usuarios,servicios_disponibles):
         Interfaz_MenuUsuario()
         try:
             opcion = input("Seleccione una opción: ")
-            if opcion == "1":
+            if opcion == "1": # ---------------- MODIFICAR DATOS -------------------
                 modificar_datos_personales(nombre,usuarios)
-            elif opcion == "2":
+            elif opcion == "2": # ---------------- MENU EVENTOS --------------------
                 menu_eventos(nombre,calendario,servicios_disponibles)
-            elif opcion == "3":
+            elif opcion == "3": # ---------------- CIERRE SESION ------------------
                 print("Cierre de sesión del usuario.")
                 registrar_auditoria(nombre, "Cerró sesión")
                 break
@@ -637,24 +637,24 @@ def imprimir_eventos(calendario):
     print(f"TOTAL GENERAL INGRESADO POR TODOS LOS EVENTOS: ${total_general}")
     print("════════════════════════════════════════════════════════════════════")
 #===================================================================================================================================
-def eliminar_evento(usuario,calendario):
+def eliminar_evento(usuario, calendario):
     """
-    Permite al usuario eliminar un evento que haya registrado.
+        Permite al usuario eliminar un evento que haya registrado.
+        Parámetros:
+            - usuario: Nombre del usuario que realiza la acción.
+            - calendario: Diccionario que contiene los eventos registrados.
     """
     try:
-        seleccion = seleccionar_fecha_salon_turno(calendario) 
-
+        seleccion = seleccionar_fecha_salon_turno(calendario)
         if not seleccion:
             print("Eliminación cancelada.")
             return
-        fecha, salon, turno = seleccion
-        clave = (fecha, salon, turno)
-        cliente = calendario[clave]["cliente"]
+        fecha, salon, turno = seleccion # Desempaqueta la selección en sus tres componentes: fecha, salón y turno.
+        clave = (fecha, salon, turno) # Crea la clave con la que se accede al evento en el diccionario `calendario`.
         calendario.pop(clave)
-
         print("Evento eliminado correctamente.")
-        registrar_auditoria(usuario, f"Eliminó un evento en {salon} el {fecha} - {turno}")
-        guardar_en_json(EVENTOS,calendario)
+        registrar_auditoria(usuario, f"Eliminó un evento en {salon} el {fecha} - {turno}") # Registra la acción en el archivo de auditoría
+        guardar_en_json(EVENTOS, calendario) # Guarda el estado actualizado del calendario en el archivo JSON correspondiente.
     except Exception as e:
         print("Error al eliminar el evento:", e)
 #===================================================================================================================================
@@ -720,12 +720,16 @@ def seleccionar_fecha_salon_turno(calendario):
     return (fecha_seleccionada, salon_seleccionado, turno_seleccionado)
 #===================================================================================================================================
 def buscarEvento(calendario):
+    """
+        Esta función permite buscar un evento específico dentro del calendario 
+        solicitando al usuario que seleccione una fecha, un salón y un turno.
+    """
     seleccion = seleccionar_fecha_salon_turno(calendario)
     if not seleccion:
         print("Búsqueda cancelada.")
         return
-    fecha, salon, turno = seleccion
-    clave = (fecha, salon, turno)
+    fecha, salon, turno = seleccion # Extrae la fecha, el salón y el turno de la selección realizada.
+    clave = (fecha, salon, turno) # Crea la clave que permite acceder al evento correspondiente en el diccionario `calendario`.
     imprimirEvento(clave, calendario[clave])
 #===================================================================================================================================
 def mostrar_menu_servicios(servicios_disponibles, servicios_seleccionados):
@@ -843,20 +847,17 @@ def seleccionar_servicios(servicios_disponibles):
 #===================================================================================================================================
 def seleccionar_opciones(lista_de_opciones):
     """
-    Muestra un menú para seleccionar el tipo de evento.
-    Devuelve el nombre del evento seleccionado o None si se cancela.
+        Esta función presenta una lista de opciones numeradas al usuario
+        y permite seleccionar una de ellas mediante su número.
+        Retorna la opción elegida o None si se cancela.
     """
-
     while True:
         opcion = input(f"Seleccione una opción (1-{len(lista_de_opciones)} o 0 para cancelar): ").strip()
         if opcion == "0":
             return None
-        if opcion.isdigit() and 1 <= int(opcion) <= len(lista_de_opciones):
-            return lista_de_opciones[int(opcion) - 1]
+        if opcion.isdigit() and 1 <= int(opcion) <= len(lista_de_opciones): # Verifica si el valor ingresado es un número y está dentro del rango de opciones disponibles.
+            return lista_de_opciones[int(opcion) - 1] # Retorna la opción seleccionada (ajustando el índice ya que las listas comienzan en 0).
         print("Opción inválida. Intente nuevamente.")
-        
-
-
 #===================================================================================================================================
 # Validación y calendario
 def esBisiesto(año):
@@ -978,31 +979,35 @@ def mostrarCalendario(año, eventos):
         # Imprime una línea en blanco al terminar cada mes.
         print()
 #===================================================================================================================================
-def programaPrincipal(usuarios, calendario,servicios_disponibles):
-    usuarios = cargar_desde_json("usuarios.json")
-    if len(usuarios) == 0:
-        usuarios["admin"] = {"contraseña": "1234", "rol": "admin"}
-    calendario = cargar_desde_json("eventos.json")
-    servicios_disponibles = cargar_desde_json("servicios.json")
+def programaPrincipal(usuarios, calendario, servicios_disponibles):
+    """
+        Función principal que coordina el funcionamiento del sistema completo.
+        Carga los datos desde archivos JSON, muestra el menú principal e invoca
+        los submenús según el tipo de usuario (admin o usuario común).
+    """
+    usuarios = cargar_desde_json("usuarios.json") # Carga los usuarios desde el archivo JSON. Sobrescribe la variable local `usuarios`.
+    if len(usuarios) == 0: # Si no se encontraron usuarios cargados...
+        usuarios["admin"] = {"contraseña": "1234", "rol": "admin"} # Se crea un usuario administrador por defecto para asegurar el acceso inicial al sistema.
+    calendario = cargar_desde_json("eventos.json") # Carga el calendario de eventos desde archivo JSON.
+    servicios_disponibles = cargar_desde_json("servicios.json") # Carga los servicios disponibles desde archivo JSON.
     while True:
         menu_interactivo()
         try:
             entrada = input("Ingrese una opción: ")
-            if entrada == "1":
+            if entrada == "1": # ---------------- INICIO SESION -------------
                 usuario_actual = iniciar_sesion(usuarios)
                 if usuario_actual:
-                    if usuarios[usuario_actual]["rol"] == "admin":
+                    if usuarios[usuario_actual]["rol"] == "admin": # Si el usuario tiene rol de administrador
                         usuarios = menu_admin(usuarios)
-                    else:
-                        menu_usuario(usuario_actual,calendario,usuarios,servicios_disponibles)
-            elif entrada == "-1":
+                    else: # usuario común.
+                        menu_usuario(usuario_actual, calendario, usuarios, servicios_disponibles)
+            elif entrada == "-1": # ---------------- SALIR SESION -------------
                 print("USTED HA FINALIZADO EL PROGRAMA. HASTA LUEGO.")
                 break
             else:
                 print("Opción inválida.")
         except:
             print("Error inesperado en el menú principal.")
-
 
 ## PROGRAMA PRINCIPAL ##
 programaPrincipal(usuarios,calendario,servicios_disponibles)

@@ -1,0 +1,20 @@
+2025-06-03,13:52:43,admin,Inicio de sesión
+2025-06-03,13:52:52,admin,Creó cuenta para martin
+2025-06-03,13:53:01,admin,Cerró sesión
+2025-06-03,13:53:07,martin,Inicio de sesión
+2025-06-03,13:54:49,martin,Inicio de sesión
+2025-06-03,13:55:40,martin,Inicio de sesión
+2025-06-03,13:56:04,martin,Agregó un evento en Palermo el 2025-09-13 - Mañana
+2025-06-03,14:53:26,martin,Inicio de sesión
+2025-06-03,14:54:21,martin,Agregó un evento en Palermo el 2025-08-14 - Noche
+2025-06-03,14:56:43,martin,Inicio de sesión
+2025-06-03,14:57:10,martin,Agregó un evento en Palermo el 2025-09-9 - Noche
+2025-06-03,14:57:52,martin,Inicio de sesión
+2025-06-03,14:58:05,martin,Inicio de sesión
+2025-06-03,14:58:24,martin,Agregó un evento en Palermo el 2025-1-2 - Mañana
+2025-06-03,15:04:04,martin,Inicio de sesión
+2025-06-03,15:04:57,martin,Agregó un evento en Nordelta el 2025-09-10 - Tarde
+2025-06-03,15:06:04,martin,Inicio de sesión
+2025-06-03,15:06:31,martin,Agregó un evento en Nordelta el 2025-8-6 - Tarde
+2025-06-03,15:07:39,martin,Inicio de sesión
+2025-06-03,15:08:03,martin,Agregó un evento en Palermo el 2025-09-8 - Mañana

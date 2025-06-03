@@ -5,10 +5,9 @@ import json
 SALONES = ["Palermo","Puerto Madero","Nordelta","San Telmo","Recoleta"]
 TURNOS  = ["Mañana","Tarde","Noche"]
 TIPOS_DE_EVENTOS = ["Fiesta de egresados","Casamiento","Cumple de XV","Despedida de soltero","Evento empresarial","Conferencia"]
-USUARIOS = "usuarios.json"
-EVENTOS = "eventos.json"
-SERVICIOS = "servicios.json"
-
+USUARIOS = "../EstructuraAlgoritmos1/Archivos/usuarios.json"
+EVENTOS = "../EstructuraAlgoritmos1/Archivos/eventos.json"
+SERVICIOS = "../EstructuraAlgoritmos1/Archivos/servicios.json"
 
 # Estructura actualizada: diccionario con contraseña y rol
 usuarios = {
@@ -19,8 +18,7 @@ usuarios = {
 calendario = {}
 
 #Creamos el diccionario con los servicios estaticos disponibles
-servicios_disponibles = {
-}
+servicios_disponibles = {}
 
 # — Capacidades máximas por salón (entre 20 y 1000) —
 capacidades_salones = {

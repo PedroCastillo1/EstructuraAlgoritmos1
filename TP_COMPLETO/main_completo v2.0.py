@@ -226,6 +226,81 @@ def guardar_en_json(nombre_archivo, diccionario):
             archivo.close() # Cierra el archivo
         except NameError:
             pass
+#===================================================================================================================================
+def guardar_facturacion(clave,evento):
+    fecha, salon, turno = clave # Desempaqueta la tupla 'clave' en las variables fecha, salón y turno
+    cliente = evento["cliente"] # Extrae del diccionario 'evento' el nombre del cliente
+    tipo = evento["tipo"] # Extrae el tipo de evento (Ej: cumpleaños, casamiento, etc.)
+    cant = evento["cant_personas"] # Extrae la cantidad de personas que asistirán al evento
+    servicios = evento["servicios"] # Extrae la lista de servicios contratados para el evento
+    precios = evento["precios"] # Extrae la lista de precios correspondientes a los servicios contratados
+    
+    
+    # 1) Calcular subtotal
+    subtotal = 0.0
+    for p in precios:
+        subtotal += p
+
+    # 2) Definir alícuotas (puedes ajustar según jurisdicción)
+    alicuota_iva = 0.21         # IVA 21%
+    alicuota_iibb = 0.03        # Ingresos Brutos 3%
+    alicuota_sellos = 0.01      # Impuesto de Sellos 1%
+
+    # 3) Calcular montos de impuestos
+    monto_iva = round(subtotal * alicuota_iva, 2)
+    monto_iibb = round(subtotal * alicuota_iibb, 2)
+    monto_sellos = round(subtotal * alicuota_sellos, 2)
+
+    # 4) Total con impuestos
+    total_con_impuestos = round(subtotal + monto_iva + monto_iibb + monto_sellos, 2)
+    
+    try:
+        arch = open(FACTURAS, "at", encoding="utf-8")
+
+        arch.write(f"FACTURA - Evento: {tipo}\n")
+        arch.write(f"Fecha: {fecha}     Salón: {salon}     Turno: {turno}\n")
+        arch.write(f"Cliente: {cliente}     Cant. personas: {cant}\n")
+        arch.write("-" * 60 + "\n\n")
+
+     
+        arch.write("SERVICIOS CONTRATADOS:\n")
+        arch.write(f"{'Descripción':30} {'Precio':>15}\n")
+        arch.write("-" * 47 + "\n")
+        # Recorremos por índice: de 0 a len(servicios)-1
+        for i in range(len(servicios)):
+            desc = servicios[i]
+            precio = precios[i]
+            # Alineamos: descripción a la izquierda 30 cols, precio a la derecha 15 cols
+            arch.write(f"{desc:30} {precio:>15.2f}\n")
+        arch.write("-" * 47 + "\n\n")
+
+        # --- 6) Escribir totales ---
+       # --- Mostrar precios con y sin impuestos ---
+        arch.write("PRECIOS:\n")
+        # Precio sin impuestos (subtotal)
+        arch.write(f"{'Subtotal (sin impuestos):':30} {subtotal:>15.2f}\n")
+        # IVA
+        arch.write(f"{'IVA 21%:':30} {monto_iva:>15.2f}\n")
+        # Ingresos Brutos
+        arch.write(f"{'Ingresos Brutos 3%:':30} {monto_iibb:>15.2f}\n")
+        # Impuesto de Sellos
+        arch.write(f"{'Impuesto de Sellos 1%:':30} {monto_sellos:>15.2f}\n")
+        arch.write("-" * 47 + "\n")
+        # Total con impuestos
+        arch.write(f"{'TOTAL A PAGAR (c/ impuestos):':30} {total_con_impuestos:>15.2f}\n")
+        arch.write("\n" + "-" * 60 + "\n")
+        arch.write("Gracias por elegirnos. ¡Que disfrute su evento!\n")
+
+        
+    except FileNotFoundError as mensaje:
+        print("No se puede abrir el archivo:", mensaje)
+    except OSError as mensaje:
+        print("No se puede leer el archivo:", mensaje)
+    finally:
+        try:
+            arch.close()
+        except NameError:
+            pass    
 #========================================= ZONA DE FUNCIONES GESTOR DE USUARIO ====================================================
 def crear_cuenta(usuarios):
     """
@@ -540,85 +615,7 @@ def agregar_evento(usuario,calendario, servicios_disponibles):
 
     except Exception as e:
         print("Error al crear el evento:", e)
-#===================================================================================================================================
-
-def guardar_facturacion(clave,evento):
-    fecha, salon, turno = clave # Desempaqueta la tupla 'clave' en las variables fecha, salón y turno
-    cliente = evento["cliente"] # Extrae del diccionario 'evento' el nombre del cliente
-    tipo = evento["tipo"] # Extrae el tipo de evento (Ej: cumpleaños, casamiento, etc.)
-    cant = evento["cant_personas"] # Extrae la cantidad de personas que asistirán al evento
-    servicios = evento["servicios"] # Extrae la lista de servicios contratados para el evento
-    precios = evento["precios"] # Extrae la lista de precios correspondientes a los servicios contratados
-    
-    
-    # 1) Calcular subtotal
-    subtotal = 0.0
-    for p in precios:
-        subtotal += p
-
-    # 2) Definir alícuotas (puedes ajustar según jurisdicción)
-    alicuota_iva = 0.21         # IVA 21%
-    alicuota_iibb = 0.03        # Ingresos Brutos 3%
-    alicuota_sellos = 0.01      # Impuesto de Sellos 1%
-
-    # 3) Calcular montos de impuestos
-    monto_iva = round(subtotal * alicuota_iva, 2)
-    monto_iibb = round(subtotal * alicuota_iibb, 2)
-    monto_sellos = round(subtotal * alicuota_sellos, 2)
-
-    # 4) Total con impuestos
-    total_con_impuestos = round(subtotal + monto_iva + monto_iibb + monto_sellos, 2)
-    
-    try:
-        arch = open(FACTURAS, "at", encoding="utf-8")
-
-        arch.write(f"FACTURA - Evento: {tipo}\n")
-        arch.write(f"Fecha: {fecha}     Salón: {salon}     Turno: {turno}\n")
-        arch.write(f"Cliente: {cliente}     Cant. personas: {cant}\n")
-        arch.write("-" * 60 + "\n\n")
-
-     
-        arch.write("SERVICIOS CONTRATADOS:\n")
-        arch.write(f"{'Descripción':30} {'Precio':>15}\n")
-        arch.write("-" * 47 + "\n")
-        # Recorremos por índice: de 0 a len(servicios)-1
-        for i in range(len(servicios)):
-            desc = servicios[i]
-            precio = precios[i]
-            # Alineamos: descripción a la izquierda 30 cols, precio a la derecha 15 cols
-            arch.write(f"{desc:30} {precio:>15.2f}\n")
-        arch.write("-" * 47 + "\n\n")
-
-        # --- 6) Escribir totales ---
-       # --- Mostrar precios con y sin impuestos ---
-        arch.write("PRECIOS:\n")
-        # Precio sin impuestos (subtotal)
-        arch.write(f"{'Subtotal (sin impuestos):':30} {subtotal:>15.2f}\n")
-        # IVA
-        arch.write(f"{'IVA 21%:':30} {monto_iva:>15.2f}\n")
-        # Ingresos Brutos
-        arch.write(f"{'Ingresos Brutos 3%:':30} {monto_iibb:>15.2f}\n")
-        # Impuesto de Sellos
-        arch.write(f"{'Impuesto de Sellos 1%:':30} {monto_sellos:>15.2f}\n")
-        arch.write("-" * 47 + "\n")
-        # Total con impuestos
-        arch.write(f"{'TOTAL A PAGAR (c/ impuestos):':30} {total_con_impuestos:>15.2f}\n")
-        arch.write("\n" + "-" * 60 + "\n")
-        arch.write("Gracias por elegirnos. ¡Que disfrute su evento!\n")
-
-        
-    except FileNotFoundError as mensaje:
-        print("No se puede abrir el archivo:", mensaje)
-    except OSError as mensaje:
-        print("No se puede leer el archivo:", mensaje)
-    finally:
-        try:
-            arch.close()
-        except NameError:
-            pass    
-
-#===================================================================================================================================
-
+#====================================================================================================================================
 def crearEvento(cliente, tipoEvento, cant_personas, servicios, precios):
     """
         Crea un evento 

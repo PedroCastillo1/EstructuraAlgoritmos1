@@ -1,0 +1,26 @@
+FACTURA - Evento: Casamiento
+Fecha: 2025-09-21     Salón: Nordelta     Turno: Noche
+Cliente: Luaaa     Cant. personas: 150
+------------------------------------------------------------
+
+SERVICIOS CONTRATADOS:
+Descripción                             Precio
+-----------------------------------------------
+Catering BÃ¡sico                     375000.00
+Catering EstÃ¡ndar                   525000.00
+Catering Premium                     750000.00
+Bartender                             25000.00
+DecoraciÃ³n bÃ¡sica                   80000.00
+Limpieza postevento                   87750.00
+-----------------------------------------------
+
+PRECIOS:
+Subtotal (sin impuestos):           1842750.00
+IVA 21%:                             386977.50
+Ingresos Brutos 3%:                   55282.50
+Impuesto de Sellos 1%:                18427.50
+-----------------------------------------------
+TOTAL A PAGAR (c/ impuestos):       2303437.50
+
+------------------------------------------------------------
+Gracias por elegirnos. ¡Que disfrute su evento!

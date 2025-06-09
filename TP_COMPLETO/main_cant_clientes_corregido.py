@@ -8,7 +8,8 @@ TIPOS_DE_EVENTOS = ["Fiesta de egresados","Casamiento","Cumple de XV","Despedida
 USUARIOS = "../EstructuraAlgoritmos1/Archivos/usuarios.json"
 EVENTOS = "../EstructuraAlgoritmos1/Archivos/eventos.json"
 SERVICIOS = "../EstructuraAlgoritmos1/Archivos/servicios.json"
-FACTURAS = "factura.txt"
+FACTURAS = "../EstructuraAlgoritmos1/Archivos/factura.txt"
+AUDITORIA = "../EstructuraAlgoritmos1/Archivos/auditoria.txt"
 # Estructura actualizada: diccionario con contraseña y rol
 usuarios = {
     #"admin": {"contraseña": "1234", "rol": "admin"},
@@ -369,7 +370,7 @@ def registrar_auditoria(usuario, accion):
             accion (str): Descripción de la acción realizada.
     """
     try:
-        arch = open("auditoria.txt", "at")  # 'a' para agregar, 't' para modo texto
+        arch = open(AUDITORIA, "at")  # 'a' para agregar, 't' para modo texto
         # Abre (o crea) el archivo 'auditoria.txt' en modo de agregar texto al final del archivo.
         # Esto evita sobrescribir el contenido anterior y asegura que cada acción quede registrada.
         
@@ -392,7 +393,7 @@ def ver_auditoria():
     """
     Auditoria_interfaz()
     try:
-        archivo = open("auditoria.txt", "rt") # archivo 'auditoria.txt' en modo lectura de texto ('rt').
+        archivo = open(AUDITORIA, "rt") # archivo 'auditoria.txt' en modo lectura de texto ('rt').
         for linea in archivo:
             print(linea.strip()) # Recorre cada línea del archivo y la imprime eliminando espacios en blanco o saltos de línea.
     except FileNotFoundError: # Captura el error si el archivo no existe.
@@ -1065,7 +1066,7 @@ def programaPrincipal(usuarios, calendario, servicios_disponibles):
     if len(usuarios) == 0: # Si no se encontraron usuarios cargados...
         usuarios["admin"] = {"contraseña": "1234", "rol": "admin"} # Se crea un usuario administrador por defecto para asegurar el acceso inicial al sistema.
     calendario = cargar_desde_json("eventos.json") # Carga el calendario de eventos desde archivo JSON.
-    servicios_disponibles = cargar_desde_json("servicios.json") # Carga los servicios disponibles desde archivo JSON.
+    servicios_disponibles = cargar_desde_json(SERVICIOS) # Carga los servicios disponibles desde archivo JSON.
     while True:
         menu_interactivo()
         try:

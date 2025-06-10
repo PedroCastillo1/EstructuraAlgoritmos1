@@ -307,17 +307,21 @@ def crear_cuenta(usuarios):
     """
         Función para crear una nueva cuenta de usuario y guardarla
     """
-    Interfaz_CrearCuenta()
-    nuevo = input("Ingrese nombre del nuevo usuario: ") # Solicita al administrador el nombre del nuevo usuario
-    if nuevo in usuarios: # Verifica si el nombre de usuario ya existe 
-        print("Ese nombre ya está en uso.")
+    try:
+        Interfaz_CrearCuenta()
+        nuevo = input("Ingrese nombre del nuevo usuario: ")  # Solicita el nombre del nuevo usuario
+        if nuevo in usuarios:  # Verifica si el nombre ya existe
+            print("Ese nombre ya está en uso.")
+            return usuarios
+        clave = input("Ingrese contraseña del nuevo usuario: ")  # Solicita una contraseña
+        usuarios[nuevo] = {"contraseña": clave, "rol": "usuario"}  # Agrega al nuevo usuario
+        print("Cuenta creada exitosamente.")
+        registrar_auditoria("admin", f"Creó cuenta para {nuevo}")  # Registra la acción
+        guardar_en_json(USUARIOS, usuarios)  # Guarda los cambios
+        return usuarios  # Devuelve el diccionario actualizado
+    except Exception as e:
+        print("Ocurrió un error al crear la cuenta:", e)
         return usuarios
-    clave = input("Ingrese contraseña del nuevo usuario: ") # Solicita una contraseña para el nuevo usuario
-    usuarios[nuevo] = {"contraseña": clave, "rol": "usuario"} # Agrega el nuevo usuario al diccionario con su contraseña y rol fijo como "usuario"
-    print("Cuenta creada exitosamente.")
-    registrar_auditoria("admin", f"Creó cuenta para {nuevo}") # Registra en el historial de auditoría que el administrador creó una nueva cuenta
-    guardar_en_json(USUARIOS, usuarios) # Guarda el diccionario de usuarios actualizado en el archivo JSON
-    return usuarios # Devuelve el diccionario de usuarios actualizado
 #==================================================================================================#    
 def imprimir_usuarios(usuarios):
     """
@@ -347,19 +351,23 @@ def eliminar_cuenta(usuarios):
     """
         Función que permite eliminar un usuario del sistema
     """
-    Interfaz_EliminarCuenta()
-    nombre = input("Ingrese el nombre del usuario que desea eliminar: ")
-    if nombre == "admin":
-        print("No se puede eliminar el usuario administrador.")
-        return usuarios # Retorna el diccionario sin cambios
-    if nombre in usuarios: # Verifica si el nombre ingresado existe en el diccionario de usuarios
-        usuarios.pop(nombre)
-        print("Usuario eliminado correctamente.")
-        registrar_auditoria("admin", f"Eliminó cuenta de {nombre}") # Registra la acción en el historial de auditoría
-        guardar_en_json(USUARIOS, usuarios) # Guarda el estado actualizado del diccionario de usuarios en el archivo JSON
-    else:
-        print("El usuario no existe.")
-    return usuarios # Retorna el diccionario actualizado (o sin cambios si no se eliminó nadie)
+    try:
+        Interfaz_EliminarCuenta()
+        nombre = input("Ingrese el nombre del usuario que desea eliminar: ")
+        if nombre == "admin":
+            print("No se puede eliminar el usuario administrador.")
+            return usuarios  # Retorna sin cambios
+        if nombre in usuarios: # Verifica si el nombre ingresado existe 
+            usuarios.pop(nombre)
+            print("Usuario eliminado correctamente.")
+            registrar_auditoria("admin", f"Eliminó cuenta de {nombre}") # Registra la acción
+            guardar_en_json(USUARIOS, usuarios) # Guarda los cambios
+        else:
+            print("El usuario no existe.")
+        return usuarios # Devuelve el diccionario actualizado
+    except Exception as e:
+        print("Ocurrió un error al eliminar la cuenta:", e)
+        return usuarios 
 #=================================================== ZONA DE AUDITORIA ===========================================================
 def registrar_auditoria(usuario, accion):
     """

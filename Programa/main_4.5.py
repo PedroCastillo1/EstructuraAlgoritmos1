@@ -1,4 +1,3 @@
-
 import math
 
 # — Constantes —
@@ -17,6 +16,7 @@ PRECIO_FOTOGRAFO   = 20000
 
 SALONES = ["Palermo", "Puerto Madero", "Nordelta", "San Telmo", "Recoleta"]
 TURNOS  = ["Mañana", "Tarde", "Noche"]
+
 
 # — Capacidades máximas por salón (entre 20 y 1000) —
 capacidades_salones = {
@@ -196,118 +196,56 @@ def mostrarCalendario(año, eventos):
         # Imprime una línea en blanco al terminar cada mes.
         print()
 #===================================================================================================================================
-def mostrar_menu_servicios(servicios_disponibles, servicios_seleccionados):
-    """
-        Muestra un menú con los servicios disponibles (excluyendo los ya seleccionados)
-        y devuelve:
-        
-            - lista de servicios disponibles para esta iteración
-            - opción para eliminar un servicio
-            - opción para finalizar la selección
-    """
-    print("\n+--------------------------------------------------+")
-    print("|        SELECCIÓN DE SERVICIOS DISPONIBLES        |")
-    print("+--------------------------------------------------+")
-
-    # Crea una lista con los servicios que aún no fueron seleccionados
-    servicios_para_mostrar = [
-        servicio for servicio in servicios_disponibles 
-        if servicio not in servicios_seleccionados
-    ]
-
-    # Recorre la lista de servicios disponibles y los imprime con su precio
-    for indice, servicio in enumerate(servicios_para_mostrar, 1):
-        nombre_formateado = servicio.ljust(30)  # Ajusta el nombre para alineación
-        precio_formateado = f"${servicios_disponibles[servicio]}"  # Precio del servicio
-        print(f"|{indice}: {nombre_formateado} {precio_formateado.rjust(14)}  |")
-
-    # Define las opciones adicionales: eliminar servicio o finalizar selección
-    opcion_eliminar = len(servicios_para_mostrar) + 1
-    opcion_finalizar = len(servicios_para_mostrar) + 2
-
-    # Muestra las opciones adicionales
-    print("+--------------------------------------------------+")
-    print(f"| {opcion_eliminar}: Eliminar un servicio elegido                 |")
-    print(f"| {opcion_finalizar}: Finalizar selección de servicios             |")
-    print("+--------------------------------------------------+")
-
-    # Devuelve las opciones necesarias para que la función principal las utilice
-    return servicios_para_mostrar, opcion_eliminar, opcion_finalizar
-
-
-def seleccionar_servicios(servicios_disponibles):
-    """
-    Permite al usuario seleccionar, eliminar y confirmar servicios desde un listado.
-    Devuelve:
-    - Lista de servicios seleccionados
-    - Lista de precios correspondientes
-    """
-
-    # Lista que almacenará los servicios que el usuario seleccione
-    servicios_seleccionados = []
-
-    # Bucle principal: se repite hasta que el usuario finalice la selección
+def seleccionarServicios(servicios_disponibles):
+    servicios, precios, seleccionados = [], [], []
     while True:
-        # Muestra el menú con los servicios disponibles y recibe las opciones válidas
-        servicios_para_elegir, opcion_eliminar, opcion_finalizar = mostrar_menu_servicios(servicios_disponibles, servicios_seleccionados)
-
-        # Pide al usuario que elija una opción
-        entrada_usuario = input("Elegí una opción: ").strip()
-
-        # Si la entrada no es un número, se informa el error
-        if not entrada_usuario.isdigit():
-            print("Entrada inválida.")
+        print("\n🎛 Servicios disponibles para seleccionar:")
+        disponibles = [s for s in servicios_disponibles if s not in seleccionados]
+        for i, s in enumerate(disponibles, 1):
+            print(f"{i}. {s} - ${servicios_disponibles[s]}")
+        opt_eliminar = len(disponibles) + 1
+        opt_finalizar = len(disponibles) + 2
+        print(f"{opt_eliminar}. ❌ Eliminar un servicio elegido")
+        print(f"{opt_finalizar}. ✅ Finalizar selección de servicios")
+        entrada = input("Elegí una opción: ").strip()
+        if not entrada.isdigit():
+            print("❌ Entrada inválida.")
             continue
-        # Convierte la entrada a entero para comparar
-        opcion_elegida = int(entrada_usuario)
-
-        # Si elige un número válido de servicio, lo agrega a la selección
-        if 1 <= opcion_elegida <= len(servicios_para_elegir):
-            servicio_elegido = servicios_para_elegir[opcion_elegida - 1]
-            servicios_seleccionados.append(servicio_elegido)
-            print(f"'{servicio_elegido}' agregado.")
-
-        # Si elige la opción para eliminar un servicio ya seleccionado
-        elif opcion_elegida == opcion_eliminar:
-            # Verifica si hay servicios para eliminar
-            if not servicios_seleccionados:
-                print("Aún no hay servicios que eliminar.")
+        eleccion = int(entrada)
+        if 1 <= eleccion <= len(disponibles):
+            s = disponibles[eleccion - 1]
+            seleccionados.append(s)
+            servicios.append(s)
+            precios.append(servicios_disponibles[s])
+            print(f"✅ '{s}' agregado.")
+        elif eleccion == opt_eliminar:
+            if not servicios:
+                print("⚠️ Aún no hay servicios que eliminar.")
                 continue
-            # Muestra los servicios seleccionados
-            print("\n Servicios seleccionados:")
-            for indice, servicio in enumerate(servicios_seleccionados, 1):
-                print(f"{indice}. {servicio}")
-
-            # Pide el número del servicio a eliminar
-            entrada_eliminar = input("Número del servicio a eliminar: ").strip()
-
-            # Si es un número válido, lo elimina
-            if entrada_eliminar.isdigit():
-                indice_eliminar = int(entrada_eliminar)
-                if 1 <= indice_eliminar <= len(servicios_seleccionados):
-                    servicio_eliminado = servicios_seleccionados.pop(indice_eliminar - 1)
-                    print(f" '{servicio_eliminado}' eliminado.")
+            print("\n🗑 Servicios ya elegidos:")
+            for idx, s in enumerate(servicios, 1):
+                print(f"{idx}. {s}")
+            q = input("Número del servicio a eliminar: ").strip()
+            if q.isdigit():
+                idx = int(q)
+                if 1 <= idx <= len(servicios):
+                    eliminado = servicios.pop(idx - 1)
+                    precios.pop(idx - 1)
+                    seleccionados.remove(eliminado)
+                    print(f"❌ '{eliminado}' eliminado.")
                 else:
                     print("Número inválido.")
             else:
                 print("Entrada inválida.")
-        # Si elige finalizar
-        elif opcion_elegida == opcion_finalizar:
-            # Solo permite finalizar si hay al menos un servicio seleccionado
-            if not servicios_seleccionados:
-                print("No podés finalizar sin al menos un servicio.")
+        elif eleccion == opt_finalizar:
+            if not servicios:
+                print("⚠️ No podés finalizar sin al menos un servicio.")
             else:
-                print("Finalizando selección...")
-                break  # Sale del bucle principal
-        # Si elige una opción que no existe
+                print("✅ Finalizando selección...")
+                break
         else:
-            print("Opción no válida.")
-
-    # Crea una lista de precios según los servicios seleccionados
-    precios_seleccionados = [servicios_disponibles[servicio] for servicio in servicios_seleccionados]
-
-    # Devuelve las dos listas: nombres y precios de los servicios
-    return servicios_seleccionados, precios_seleccionados
+            print("❌ Opción no válida.")
+    return servicios, precios
 #===================================================================================================================================
 def crearEvento(cliente, tipoEvento, cant_personas, servicios, precios):
     """
@@ -321,7 +259,8 @@ def crearEvento(cliente, tipoEvento, cant_personas, servicios, precios):
         "cant_personas": cant_personas,
         "servicios": servicios,
         "precios": precios
-    }
+    }    
+#===================================================================================================================================
 def agregarEventoACalendario(calendario, fecha, salon, turno, evento):
     # Crea una clave única para el evento combinando la fecha, salón y turno en una tupla
     clave = (fecha, salon, turno)
@@ -440,58 +379,20 @@ def imprimir_eventos(calendario):
     print("════════════════════════════════════════════════════════════════════")
 
 #===================================================================================================================================
-def imprimir_bloque(titulo, opciones, min_width=48):
-    """
-    Imprime un bloque ASCII de ancho fijo (min_width + 2 bordes),
-    con título centrado, línea separadora, y lista de opciones.
-    """
-    # Calcula el ancho interior (mínimo, longitud del título u opciones)
-    ancho = max(min_width, len(titulo), *(len(opt) for opt in opciones))
-    borde    = "+" + "-" * (ancho + 2) + "+"
-    separador = "|" + "-" * (ancho + 2) + "|"
-
-    print(borde)
-    print(f"| {titulo.center(ancho)} |")
-    print(separador)
-    for opt in opciones:
-        print(f"| {opt.ljust(ancho)} |")
-    print(borde)
-
-
-#===================================================================================================================================
-def imprimir_bloque(titulo, opciones, min_width=48, separar_ultimo=False):
-    """
-    Imprime un bloque ASCII de ancho fijo (mínimo interior = min_width),
-    con título centrado, línea separadora y lista de opciones.
-    Si separar_ultimo=True, dibuja una línea adicional antes de la última opción.
-    """
-    ancho = max(min_width, len(titulo), *(len(opt) for opt in opciones))
-    borde     = "+" + "-" * (ancho + 2) + "+"
-    separador = "|" + "-" * (ancho + 2) + "|"
-
-    print(borde)
-    print(f"| {titulo.center(ancho)} |")
-    print(separador)
-
-    if separar_ultimo and len(opciones) > 1:
-        for opt in opciones[:-1]:
-            print(f"| {opt.ljust(ancho)} |")
-        print(separador)  # separación antes de la última
-        print(f"| {opciones[-1].ljust(ancho)} |")
-    else:
-        for opt in opciones:
-            print(f"| {opt.ljust(ancho)} |")
-
-    print(borde)
-
-
 def opcionCrearEvento(calendario, servicios_disponibles):
-    
-    # 1) Cliente
+    """
+        ACA VAMOS A TENER QUE AGREGAR LOS NUEVOS PARAMETROS QUE VA A TENER EL EVENTO 
+                Diccionario {(CLAVE),[VALORES]}
+        Diccionario eventos {(fecha,salon,turno),[cliente,tipoevento,cantpersonas]}
+        
+        (FECHA -- SALON -- TURNO) PARTE DE LA CLAVE
+        (CLIENTE -- TIPO DE EVENTO -- CANTIDAD DE PERSONAS -- ETC) PARTE DE LOS VALORES
+          
+    """
     interfaz_crear_evento()
+    # 1) Cliente y tipo
     cliente = input("Ingrese su nombre: ").strip().title()
-
-    # 2) Tipo de evento
+    # 2) Tipo de evento: selección por número
     tipos_evento = [
         "Fiesta de egresados",
         "Casamiento",
@@ -500,18 +401,16 @@ def opcionCrearEvento(calendario, servicios_disponibles):
         "Evento empresarial",
         "Conferencia"
     ]
-    opciones_tipo = [f"{i}) {t}" for i, t in enumerate(tipos_evento, 1)]
-    opciones_tipo.append("0) Cancelar")
-    imprimir_bloque("TIPO DE EVENTO", opciones_tipo, min_width=48, separar_ultimo=True)
-
     while True:
-        sel = input(f"Elija tipo (0-{len(tipos_evento)}): ").strip()
-        if sel == "0":
-            return None
+        print("Seleccione el tipo de evento:")
+        for i, t in enumerate(tipos_evento, 1):
+            print(f"  {i}) {t}")
+        sel = input(f"Opción (1-{len(tipos_evento)}): ").strip()
         if sel.isdigit() and 1 <= int(sel) <= len(tipos_evento):
             tipo = tipos_evento[int(sel) - 1]
             break
         print("Opción inválida. Intente nuevamente.")
+
 
     # 3) Cantidad de personas
     while True:
@@ -527,36 +426,32 @@ def opcionCrearEvento(calendario, servicios_disponibles):
         if validarFecha(fecha):
             break
         print("Formato inválido. Use YYYY-MM-DD.")
-
+    
     # 5) Salón
-    opciones_salones = [f"{i}) {s}" for i, s in enumerate(SALONES, 1)]
-    opciones_salones.append("0) Cancelar")
-    imprimir_bloque("SELECCIONE SALÓN", opciones_salones, min_width=48, separar_ultimo=True)
-
+    print("Seleccione el salón:")
+    for i, nombre in enumerate(SALONES, 1):
+        print(f"  {i}) {nombre}")
     while True:
-        sel = input(f"Elija salón (0-{len(SALONES)}): ").strip()
-        if sel == "0":
-            return None
+        sel = input(f"Opción (1-{len(SALONES)}): ").strip()
         if sel.isdigit() and 1 <= int(sel) <= len(SALONES):
             salon = SALONES[int(sel) - 1]
             break
         print("Opción inválida. Intente nuevamente.")
 
     # 6) Turno
-    opciones_turnos = [f"{i}) {t}" for i, t in enumerate(TURNOS, 1)]
-    opciones_turnos.append("0) Cancelar")
-    imprimir_bloque("SELECCIONE TURNO", opciones_turnos, min_width=48, separar_ultimo=True)
-
+    print("Seleccione el turno:")
+    for i, nombre in enumerate(TURNOS, 1):
+        print(f"  {i}) {nombre}")
     while True:
-        sel = input(f"Elija turno (0-{len(TURNOS)}): ").strip()
-        if sel == "0":
-            return None
+        sel = input(f"Opción (1-{len(TURNOS)}): ").strip()
         if sel.isdigit() and 1 <= int(sel) <= len(TURNOS):
             turno = TURNOS[int(sel) - 1]
             break
         print("Opción inválida. Intente nuevamente.")
 
-    # 7) Validar capacidad
+
+
+    # 7) Validar capacidad del salón
     max_cap = capacidades_salones[salon]
     while cant > max_cap:
         print(f"El salón {salon} admite hasta {max_cap} personas.")
@@ -564,95 +459,38 @@ def opcionCrearEvento(calendario, servicios_disponibles):
         if val.isdigit() and 1 <= int(val) <= max_cap:
             cant = int(val)
             break
-        print("Entrada inválida.")
+        print("Entrada inválida.")    
 
-    # 8) Construir servicios
+    # 8) Construir dict con TODOS los servicios (fijos + dinámicos)
+
+    # — Copiamos los servicios “fijos” (DJ, Fotógrafo, etc.) para no modificar el global.
     servicios_evento = servicios_disponibles.copy()
-    servicios_evento[f"Catering Básico   ({cant}×)"]   = PRECIO_CATERING_BASIC   * cant
-    servicios_evento[f"Catering Estándar ({cant}×)"]   = PRECIO_CATERING_STD     * cant
-    servicios_evento[f"Catering Premium  ({cant}×)"]   = PRECIO_CATERING_PREMIUM * cant
-    m = math.ceil(cant / 4)
-    servicios_evento[f"Moso x{m}"]      = PRECIO_MOSO      * m
-    b = math.ceil(cant / 20)
-    servicios_evento[f"Bartender x{b}"] = PRECIO_BARTENDER * b
-    g = math.ceil(cant / 30)
-    servicios_evento[f"Guardia x{g}"]   = PRECIO_SEGURIDAD * g
+    servicios_evento[f"Catering Básico   ({cant}×plato)"]   = PRECIO_CATERING_BASIC   * cant
+    servicios_evento[f"Catering Estándar ({cant}×plato)"]   = PRECIO_CATERING_STD     * cant
+    servicios_evento[f"Catering Premium  ({cant}×plato)"]   = PRECIO_CATERING_PREMIUM * cant
 
-    # 9) Selección de servicios
-    servicios, precios = seleccionar_servicios(servicios_evento)
+    #math.ceil(x) devuelve el entero más pequeño que sea mayor o igual que x
+    m = math.ceil(cant / 4)
+    servicios_evento[f"Moso x{m}"]                          = PRECIO_MOSO       * m
+    b = math.ceil(cant / 20)
+    servicios_evento[f"Bartender x{b}"]                    = PRECIO_BARTENDER  * b
+    g = math.ceil(cant / 30)
+    servicios_evento[f"Guardia x{g}"]                      = PRECIO_SEGURIDAD  * g
+
+  
+    # 9) Selección ÚNICA: usuario elige *todo* de esta lista
+    servicios, precios = seleccionarServicios(servicios_evento)
+
     subtotal = sum(precios)
     limpieza = subtotal * PORCENTAJE_LIMPIEZA
     servicios.append("Limpieza post-evento (5%)")
     precios.append(limpieza)
 
-    # 10) Registrar y mostrar evento
+    # 10) Crear y registrar evento
     evento = crearEvento(cliente, tipo, cant, servicios, precios)
     agregarEventoACalendario(calendario, fecha, salon, turno, evento)
     imprimirEvento((fecha, salon, turno), evento)
     return
-
-
-
-def obtener_fecha_salon_y_turno(eventos_calendar, mostrar_interfaz_evento):
-    """
-    Muestra dos pantallas ASCII para:
-      1) Selección de fecha
-      2) Selección de salón y turno
-    Cada pantalla usa el bloque global `imprimir_bloque`:
-      - Título centrado
-      - Línea de separación antes de la opción 0 (separar_ultimo=True)
-      - Opciones + 0) Salir
-    Devuelve (fecha, salón, turno) o None si se elige 0.
-    """
-    # Derivar título de la función de interfaz
-    encabezado = (mostrar_interfaz_evento.__name__
-                 .replace("interfaz_", "")
-                 .replace("_", " ")
-                 .upper())
-
-    # --- Pantalla 1: selección de fecha ---
-    fechas = sorted({evt[0] for evt in eventos_calendar})
-    if not fechas:
-        print("No hay eventos cargados.")
-        return None
-
-    opciones_fechas = [f"{i}) {f}" for i, f in enumerate(fechas, start=1)]
-    opciones_fechas.append("0) Salir")
-    imprimir_bloque(encabezado, opciones_fechas, min_width=48, separar_ultimo=True)
-
-    # Lectura de la elección
-    while True:
-        ent = input(f"Elija fecha (0-{len(fechas)}): ").strip()
-        if ent == "0":
-            return None
-        if ent.isdigit() and 1 <= int(ent) <= len(fechas):
-            fecha_sel = fechas[int(ent) - 1]
-            break
-        print("Opción inválida. Intente nuevamente.")
-
-    # --- Pantalla 2: selección de salón y turno ---
-    eventos_en_fecha = [e for e in eventos_calendar if e[0] == fecha_sel]
-    opciones_eventos = [
-        f"{i}) Salón {sal} – Turno {tur}"
-        for i, (_, sal, tur) in enumerate(eventos_en_fecha, start=1)
-    ]
-    opciones_eventos.append("0) Salir")
-    imprimir_bloque(encabezado, opciones_eventos, min_width=48, separar_ultimo=True)
-
-    # Lectura de la elección de evento
-    while True:
-        ent = input(f"Elija evento (0-{len(eventos_en_fecha)}): ").strip()
-        if ent == "0":
-            return None
-        if ent.isdigit() and 1 <= int(ent) <= len(eventos_en_fecha):
-            _, salon_sel, turno_sel = eventos_en_fecha[int(ent) - 1]
-            break
-        print("Opción inválida. Intente nuevamente.")
-
-    return fecha_sel, salon_sel, turno_sel
-
-
-
 #===================================================================================================================================
 ##################################  PROGRAMA PRINCIPAL ###########################################
 #Creamos el diccionario Calendario
@@ -682,9 +520,38 @@ while True:
         else:
             print("No hay eventos cargados en el calendario.")
     elif opcion == "3": # ---------------- ELIMINAR UN EVENTO ---------------------
-        seleccion_evento = obtener_fecha_salon_y_turno(calendario, interfaz_eliminar_evento)
-        if seleccion_evento:
-            eliminarEvento(calendario, *seleccion_evento)
+            interfaz_eliminar_evento()
+            # 1) Elegir fecha de entre las que ya existen
+            fechas = sorted({clave[0] for clave in calendario})
+            if not fechas:
+                print("No hay eventos cargados.")
+                continue
+
+            print("Seleccione la fecha del evento:")
+            for i, fecha_dispo in enumerate(fechas, 1):
+                print(f"  {i}) {fecha_dispo}")
+            while True:
+                sel = input(f"Opción (1-{len(fechas)}): ").strip()
+                if sel.isdigit() and 1 <= int(sel) <= len(fechas):
+                    f = fechas[int(sel)-1]
+                    break
+                print("Opción inválida. Intente nuevamente.")
+
+            # 2) Filtrar los eventos de esa fecha y pedir salón/turno
+            opciones_evento = [clave for clave in calendario if clave[0] == f]
+            print(f"Eventos en {f}:")
+            for i, (_, salon_i, turno_i) in enumerate(opciones_evento, 1):
+                print(f"  {i}) Salón {salon_i} – Turno {turno_i}")
+            while True:
+                sel = input(f"Opción (1-{len(opciones_evento)}): ").strip()
+                if sel.isdigit() and 1 <= int(sel) <= len(opciones_evento):
+                    _, s, t = opciones_evento[int(sel)-1]
+                    break
+                print("Opción inválida. Intente nuevamente.")
+
+            # 3) Llamar a eliminar
+            eliminarEvento(calendario, f, s, t)
+
     elif opcion == "4": # ---------------- IMPRIMIR EL CALENDARIO ---------------------
         interfaz_mostrar_calendario()
         while True:
@@ -695,9 +562,37 @@ while True:
             print("Ingrese un año válido (ej: 2025).")
         mostrarCalendario(año, calendario)
     elif opcion == "5": # ---------------- BUSCAR UN EVENTO ---------------------
-        seleccion_evento = obtener_fecha_salon_y_turno(calendario, interfaz_buscar_evento)
-        if seleccion_evento:
-            buscarEvento(calendario, *seleccion_evento)
+        interfaz_buscar_evento()
+        fechas = sorted({clave[0] for clave in calendario})
+        if not fechas:
+            print("No hay eventos cargados.")
+            continue
+
+        # Selección fecha
+        print("Seleccione la fecha del evento:")
+        for i, f_dispo in enumerate(fechas, 1):
+            print(f"  {i}) {f_dispo}")
+        while True:
+            sel = input(f"Opción (1-{len(fechas)}): ").strip()
+            if sel.isdigit() and 1 <= int(sel) <= len(fechas):
+                f = fechas[int(sel)-1]
+                break
+            print("Opción inválida. Intente nuevamente.")
+
+        # Selección salón/turno
+        opciones = [c for c in calendario if c[0] == f]
+        print(f"Eventos en {f}:")
+        for i, (_, sal, tur) in enumerate(opciones, 1):
+            print(f"  {i}) Salón {sal} – Turno {tur}")
+        while True:
+            sel = input(f"Opción (1-{len(opciones)}): ").strip()
+            if sel.isdigit() and 1 <= int(sel) <= len(opciones):
+                _, s, t = opciones[int(sel)-1]
+                break
+            print("Opción inválida. Intente nuevamente.")
+
+        buscarEvento(calendario, f, s, t)
+
             
     elif opcion == "6": # ---------------- SALIR DEL PROGRAMA ---------------------
         interfaz_salir_gestor_eventos()

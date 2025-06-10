@@ -5,9 +5,10 @@ import json
 SALONES = ["Palermo","Puerto Madero","Nordelta","San Telmo","Recoleta"]
 TURNOS  = ["Mañana","Tarde","Noche"]
 TIPOS_DE_EVENTOS = ["Fiesta de egresados","Casamiento","Cumple de XV","Despedida de soltero","Evento empresarial","Conferencia"]
-USUARIOS = "../EstructuraAlgoritmos1/Archivos/usuarios.json"
-EVENTOS = "../EstructuraAlgoritmos1/Archivos/eventos.json"
-SERVICIOS = "../EstructuraAlgoritmos1/Archivos/servicios.json"
+VALORES_DE_EVENTOS = ["Fecha", "Salon", "Turno", "Cliente", "Tipo de evento", "Cantidad de personas", "Servicios"]
+USUARIOS = "usuarios.json"
+EVENTOS = "eventos.json"
+SERVICIOS = "servicios.json"
 FACTURAS = "factura.txt"
 # Estructura actualizada: diccionario con contraseña y rol
 usuarios = {
@@ -101,8 +102,9 @@ def Interfaz_MenuEvento():
     print("|                             3. Eliminar un evento                                                     |")
     print("|                             4. Mostrar Calendario                                                     |")
     print("|                             5. Buscar Evento                                                          |")
+    print("|                             6. Editar Evento                                                          |")  
     print("=========================================================================================================")
-    print("|                             6. Volver al menú anterior                                                |")
+    print("|                             7. Volver al menú anterior                                                |")
     print("=========================================================================================================")
 def Interfaz_CrearEvento():
     print("=========================================================================================================")
@@ -172,13 +174,28 @@ def interfaz_tipo_turno():
     print("=========================================================================================================")
     print("|                             0. Cancelar                                                               |")
     print("=========================================================================================================")
+
+def interfazValorAModificar():
+    print("=========================================================================================================")
+    print("|                                      SELECCIONE VALOR A MODIFICAR                                       |")
+    print("=========================================================================================================")
+    print("|                             1. Fecha                                                                  |")
+    print("|                             2. Salon                                                                  |")
+    print("|                             3. Turno                                                                  |")
+    print("|                             4. Cliente                                                                |")
+    print("|                             5. Tipo de evento                                                         |")
+    print("|                             6. Cantidad de personas                                                   |")
+    print("|                             7. Servicios                                                              |")
+    print("=========================================================================================================")
+    print("|                             0. Cancelar                                                               |")
+    print("=========================================================================================================")
 #=================================================== ZONA DE JSON ==================================================================
 def cargar_desde_json(nombre_archivo):
     """
         Intenta abrir y procesar un archivo JSON
     """
     try:
-        archivo = open(nombre_archivo, "r") # Abre el archivo en modo lectura ("r")
+        archivo = open(nombre_archivo, "r",encoding="utf-8") # Abre el archivo en modo lectura ("r")
         datos = json.load(archivo) # Carga el contenido JSON del archivo
         reconstruido = {} # Se crea un nuevo diccionario vacío donde se reconstruirán las claves
         for k, v in datos.items(): # Recorre cada par clave-valor del diccionario original
@@ -211,7 +228,7 @@ def guardar_en_json(nombre_archivo, diccionario):
     """
     try:
         # Abre el archivo en modo escritura ("w"), Si el archivo ya existe, su contenido será sobrescrito
-        archivo = open(nombre_archivo, "w")
+        archivo = open(nombre_archivo, "w",encoding="utf-8")
         # Se crea un nuevo diccionario en el que:
         #   - Cada clave que sea una tupla se convierte a string JSON con json.dumps (porque JSON no acepta tuplas como claves)
         #   - Las claves que no sean tuplas se dejan como están
@@ -451,13 +468,20 @@ def menu_eventos(usuario,calendario,servicios_disponibles):
 
         elif opcion == "5": # ---------------- BUSCAR UN EVENTO -------------
             interfaz_buscar_evento()
-            buscarEvento(calendario)
+            clave , evento = buscarEvento(calendario)
+            imprimirEvento(clave, evento)
+            clave , evento = buscarEvento(calendario)
+            imprimirEvento(clave, evento)
            
         elif opcion == "6": # ---------------- SALIR DEL PROGRAMA -------------
+            clave, evento = editarEvento(calendario, servicios_disponibles)
+            imprimirEvento(clave, evento)
+            
+        elif opcion == "7": # ---------------- VOLVER AL MENÚ ANTERIOR -------------
             interfaz_salir_gestor_eventos()
             break
-        else:
-            print("Opción inválida. Intente con un número del 1 al 6.")
+        else: # Si la opción no es válida
+            print("Opción inválida. Intente con un número del 1 al 7.")
 #===================================================================================================================================
 def agregar_evento(usuario,calendario, servicios_disponibles):
     """
@@ -807,7 +831,122 @@ def buscarEvento(calendario):
         return
     fecha, salon, turno = seleccion # Extrae la fecha, el salón y el turno de la selección realizada.
     clave = (fecha, salon, turno) # Crea la clave que permite acceder al evento correspondiente en el diccionario `calendario`.
-    imprimirEvento(clave, calendario[clave])
+    return clave, calendario[clave]
+#===================================================================================================================================
+def editarEvento(calendario,servicios_disponibles):
+    clave = seleccionar_fecha_salon_turno(calendario)
+    if not clave:
+        print("Edición cancelada.")
+        return
+    fechaNueva, salonNuevo, turnoNuevo = clave
+    claveNueva = (fechaNueva, salonNuevo, turnoNuevo)  # Crea la clave única para acceder al evento en el calendario
+    evento = calendario[clave]  # Obtiene el evento correspondiente a la clave seleccionada
+    interfazValorAModificar() 
+    valorAModificar = seleccionar_opciones(VALORES_DE_EVENTOS)
+    while valorAModificar is not None:
+        if valorAModificar == "Cliente":
+            nuevo_cliente = input("Ingrese el nuevo nombre del cliente: ").strip().title()
+            print(f"Cliente modificado a {nuevo_cliente}.")
+            evento["cliente"] = nuevo_cliente
+        
+        elif valorAModificar == "Tipo de evento":
+            interfaz_tipo_evento()
+            nuevo_tipo = seleccionar_opciones(TIPOS_DE_EVENTOS)
+            evento["tipo"] = nuevo_tipo
+        elif valorAModificar == "Cantidad de personas":
+            while True:
+                val = input("Ingrese la nueva cantidad de personas: ").strip()
+                if val.isdigit() and int(val) > 0:
+                    cant = int(val)
+                    max_cap = capacidades_salones[salonNuevo]
+                    if cant <= max_cap:
+                        evento["cant_personas"] = cant
+                        break
+                    else:
+                        print(f"La cantidad máxima para el salón {salonNuevo} es {max_cap}.")
+                else:
+                    print("Por favor ingrese un número entero positivo.")
+            print(f"Cantidad de personas modificada a {cant}.")
+            evento["cant_personas"] = cant
+
+            servicios_evento = calendario[clave]["servicios"].copy()  # Copia los servicios del evento original
+            precios_evento = calendario[clave]["precios"].copy()  # Copia los precios del evento original
+            for i in range(len(servicios_evento)):
+                servicio = servicios_evento[i]
+                precio = precios_evento[i]
+                if servicio in servicios_disponibles:
+                    if servicios_disponibles[servicio]["tipo"] == "variable":
+                        # Calcula el nuevo precio variable según la cantidad de personas
+                        precios_evento[i] = servicios_disponibles[servicio]["precio"] * cant
+                    else:
+                        # Mantiene el precio fijo
+                        precios_evento[i] = servicios_disponibles[servicio]["precio"]
+                elif servicio == "Limpieza postevento":
+                    # Actualiza el precio de limpieza según la nueva cantidad de personas
+                    precios_evento[i] = precios_evento[i] * cant * 0.05
+            evento["servicios"] = servicios_evento
+            evento["precios"] = precios_evento
+
+        elif valorAModificar == "Servicios":
+            servicios_evento = servicios_disponibles.copy()
+            for servicio, precio in servicios_evento.items():
+                if precio["tipo"] == "variable":
+                    # Calcula el precio variable según la cantidad de personas
+                    servicios_evento[servicio] = precio["precio"] * evento["cant_personas"]
+                else:
+                    # Mantiene el precio fijo
+                    servicios_evento[servicio] = precio["precio"]
+            # 9) Selección de servicios
+            nuevos_servicios, nuevos_precios = seleccionar_servicios(servicios_evento)
+            evento["servicios"] = nuevos_servicios
+            evento["precios"] = nuevos_precios
+            print("Servicios modificados correctamente.")
+        elif valorAModificar == "Fecha":
+            while True:
+                fechaNueva = input("Ingrese la nueva fecha del evento (YYYY-MM-DD): ").strip()
+                if validarFecha(fechaNueva):
+                    # Verifica si ya existe un evento en esa fecha, salón y turno
+                    if (fechaNueva, salonNuevo, turnoNuevo) in calendario:
+                        print("Ya existe un evento en esa fecha, salón y turno. No se puede modificar.")
+                    else:
+                        claveNueva = (fechaNueva, salonNuevo, turnoNuevo)
+                        print(f"Fecha modificada a {fechaNueva}.")
+                        break
+        elif valorAModificar == "Turno":
+            interfaz_tipo_turno()
+            turnoNuevo = seleccionar_opciones(TURNOS)
+            if turnoNuevo is None:
+                print("Edición cancelada.")
+                return
+            # Verifica si ya existe un evento en esa fecha, salón y turno
+            if (fechaNueva, salonNuevo, turnoNuevo) in calendario:
+                print("Ya existe un evento en esa fecha, salón y turno. No se puede modificar.")
+                return
+            else:
+                print(f"Turno modificado a {turnoNuevo}.")
+                claveNueva = (fechaNueva, salonNuevo, turnoNuevo)
+        elif valorAModificar == "Salon":
+            interfaz_tipo_salon()
+            salonNuevo = seleccionar_opciones(SALONES)
+            if salonNuevo is None:
+                print("Edición cancelada.")
+                return
+            # Verifica si ya existe un evento en esa fecha, salón y turno
+            if (fechaNueva, salonNuevo, turnoNuevo) in calendario:
+                print("Ya existe un evento en esa fecha, salón y turno. No se puede modificar.")
+                return
+            else:
+                print(f"Salón modificado a {salonNuevo}.")
+                claveNueva = (fechaNueva, salonNuevo, turnoNuevo)
+        else:
+            print("Opción no válida.")
+            return
+        interfazValorAModificar()
+        valorAModificar = seleccionar_opciones(VALORES_DE_EVENTOS)
+    
+    calendario.pop(clave)  # Elimina el evento original del calendario
+    calendario[claveNueva] = evento  # Agrega el evento modificado con la nueva clave
+    return claveNueva, evento  # Devuelve la nueva clave y el evento modificado     
 #===================================================================================================================================
 def mostrar_menu_servicios(servicios_disponibles, servicios_seleccionados):
     """
@@ -846,8 +985,6 @@ def mostrar_menu_servicios(servicios_disponibles, servicios_seleccionados):
 
     # Devuelve las opciones necesarias para que la función principal las utilice
     return servicios_para_mostrar, opcion_eliminar, opcion_finalizar
-
-
 def seleccionar_servicios(servicios_disponibles):
     """
     Permite al usuario seleccionar, eliminar y confirmar servicios desde un listado.

@@ -2,7 +2,7 @@ from datetime import datetime
 import json
 
 # — Constantes —
-SALONES = ["Palermo","Puerto Madero","Nordelta","San Telmo ","Recoleta"]
+SALONES = ["Palermo","Puerto Madero","Nordelta","San Telmo","Recoleta"]
 TURNOS  = ["Mañana","Tarde","Noche"]
 TIPOS_DE_EVENTOS = ["Fiesta de egresados","Casamiento","Cumple de XV","Despedida de soltero","Evento empresarial","Conferencia"]
 ATRIBUTOS_DE_EVENTOS = ["Fecha", "Salon", "Turno", "Cliente", "Tipo de evento", "Cantidad de personas", "Servicios"]
@@ -201,7 +201,7 @@ def cargar_desde_json(nombre_archivo):
         for k, v in datos.items(): # Recorre cada par clave-valor del diccionario original
             try:
                 clave = json.loads(k) # Intenta decodificar la clave desde una cadena JSON
-                if isinstance(clave, list):
+                if isinstance(clave, list): # verifica si un objeto es de un tipo específico
                     clave = tuple(clave) # Si la clave es una lista, se convierte en tupla (porque las listas no pueden ser claves en diccionarios)
                 reconstruido[clave] = v # Asigna el valor al nuevo diccionario
             except json.JSONDecodeError: # Si ocurre un error al intentar decodificar la clave (no era JSON válido)
@@ -1205,7 +1205,7 @@ def programaPrincipal(usuarios, calendario, servicios_disponibles):
         Carga los datos desde archivos JSON, muestra el menú principal e invoca
         los submenús según el tipo de usuario (admin o usuario común).
     """
-    usuarios = cargar_desde_json("usuarios.json") # Carga los usuarios desde el archivo JSON. Sobrescribe la variable local `usuarios`.
+    usuarios = cargar_desde_json(USUARIOS) # Carga los usuarios desde el archivo JSON. Sobrescribe la variable local `usuarios`.
     if len(usuarios) == 0: # Si no se encontraron usuarios cargados...
         usuarios["admin"] = {"contraseña": "1234", "rol": "admin"} # Se crea un usuario administrador por defecto para asegurar el acceso inicial al sistema.
     calendario = cargar_desde_json("eventos.json") # Carga el calendario de eventos desde archivo JSON.

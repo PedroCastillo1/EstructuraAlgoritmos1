@@ -825,18 +825,19 @@ def editarEvento(calendario,servicios_disponibles,usuario):
     fechaNueva, salonNuevo, turnoNuevo = clave
     claveNueva = (fechaNueva, salonNuevo, turnoNuevo)  # Crea la clave única para acceder al evento en el calendario
     evento = calendario[clave]  # Obtiene el evento correspondiente a la clave seleccionada
+    eventoNuevo = evento.copy()  # Crea una copia del evento para modificarlo sin afectar el original hasta confirmar los cambios
     interfazValorAModificar() 
     valorAModificar = seleccionar_opciones(ATRIBUTOS_DE_EVENTOS)
     while valorAModificar is not None:
         if valorAModificar == "Cliente":
             nuevo_cliente = input("Ingrese el nuevo nombre del cliente: ").strip().title()
             print(f"Cliente modificado a {nuevo_cliente}.")
-            evento["cliente"] = nuevo_cliente
-        
+            eventoNuevo["cliente"] = nuevo_cliente
+
         elif valorAModificar == "Tipo de evento":
             interfaz_tipo_evento()
             nuevo_tipo = seleccionar_opciones(TIPOS_DE_EVENTOS)
-            evento["tipo"] = nuevo_tipo
+            eventoNuevo["tipo"] = nuevo_tipo
         elif valorAModificar == "Cantidad de personas":
             while True:
                 val = input("Ingrese la nueva cantidad de personas: ").strip()
@@ -851,7 +852,7 @@ def editarEvento(calendario,servicios_disponibles,usuario):
                 else:
                     print("Por favor ingrese un número entero positivo.")
             print(f"Cantidad de personas modificada a {cant}.")
-            evento["cant_personas"] = cant
+            eventoNuevo["cant_personas"] = cant
 
             servicios_evento = calendario[clave]["servicios"].copy()  # Copia los servicios del evento original
             precios_evento = calendario[clave]["precios"].copy()  # Copia los precios del evento original
@@ -868,8 +869,8 @@ def editarEvento(calendario,servicios_disponibles,usuario):
                 elif servicio == "Limpieza postevento":
                     # Actualiza el precio de limpieza según la nueva cantidad de personas
                     precios_evento[i] = precios_evento[i] * cant * 0.05
-            evento["servicios"] = servicios_evento
-            evento["precios"] = precios_evento
+            eventoNuevo["servicios"] = servicios_evento
+            eventoNuevo["precios"] = precios_evento
 
         elif valorAModificar == "Servicios":
             servicios_evento = servicios_disponibles.copy()
@@ -882,8 +883,8 @@ def editarEvento(calendario,servicios_disponibles,usuario):
                     servicios_evento[servicio] = precio["precio"]
             # 9) Selección de servicios
             nuevos_servicios, nuevos_precios = seleccionar_servicios(servicios_evento)
-            evento["servicios"] = nuevos_servicios
-            evento["precios"] = nuevos_precios
+            eventoNuevo["servicios"] = nuevos_servicios
+            eventoNuevo["precios"] = nuevos_precios
             print("Servicios modificados correctamente.")
         elif valorAModificar == "Fecha":
             while True:
@@ -901,11 +902,11 @@ def editarEvento(calendario,servicios_disponibles,usuario):
             turnoNuevo = seleccionar_opciones(TURNOS)
             if turnoNuevo is None:
                 print("Edición cancelada.")
-                return
+                break
             # Verifica si ya existe un evento en esa fecha, salón y turno
             if (fechaNueva, salonNuevo, turnoNuevo) in calendario:
                 print("Ya existe un evento en esa fecha, salón y turno. No se puede modificar.")
-                return
+                break
             else:
                 print(f"Turno modificado a {turnoNuevo}.")
                 claveNueva = (fechaNueva, salonNuevo, turnoNuevo)
@@ -917,25 +918,29 @@ def editarEvento(calendario,servicios_disponibles,usuario):
                 salonNuevo = seleccionar_opciones(SALONES)
             if salonNuevo is None:
                 print("Edición cancelada.")
-                return
+                break
             # Verifica si ya existe un evento en esa fecha, salón y turno
             if (fechaNueva, salonNuevo, turnoNuevo) in calendario:
                 print("Ya existe un evento en esa fecha, salón y turno. No se puede modificar.")
-                return
+                break
             else:
                 print(f"Salón modificado a {salonNuevo}.")
                 claveNueva = (fechaNueva, salonNuevo, turnoNuevo)
         else:
             print("Opción no válida.")
-            return
+            break
         interfazValorAModificar()
         valorAModificar = seleccionar_opciones(ATRIBUTOS_DE_EVENTOS)
     
     calendario.pop(clave)  # Elimina el evento original del calendario
-    calendario[claveNueva] = evento  # Agrega el evento modificado con la nueva clave
-    registrar_auditoria(usuario, f"Editó un evento en {salonNuevo} el {fechaNueva} - {turnoNuevo}")  # Registra la acción
+    calendario[claveNueva] = eventoNuevo  # Agrega el evento modificado con la nueva clave
+    lineaDeAuditoria = f"Editó el evento de {evento['cliente']} en {clave} a {claveNueva}"
+    for atributo in ["cliente", "tipo", "cant_personas", "servicios", "precios"]:
+        if evento[atributo] != eventoNuevo[atributo]:
+            lineaDeAuditoria += f", {atributo} de '{evento[atributo]}' a '{eventoNuevo[atributo]}'"
+    registrar_auditoria(usuario, lineaDeAuditoria)  # Registra la acción en el archivo de auditoría
     guardar_en_json(EVENTOS, calendario)  # Guarda los cambios en el archivo JSON
-    return claveNueva, evento  # Devuelve la nueva clave y el evento modificado
+    return claveNueva, eventoNuevo  # Devuelve la nueva clave y el evento modificado
 #=======================================================================================================
 
 def agregar_servicio(servicios_disponibles):
@@ -1034,7 +1039,7 @@ def editar_servicio(servicios_disponibles):
                         print("Precio inválido. Ingrese un número.")
             else:
                 print("Opción no válida.")
-            interfazAtributoDeServicioAModificar
+            interfazAtributoDeServicioAModificar()
             opcion_modificar = seleccionar_opciones(opciones_modificar)
         else:
             print("Operación terminada.")

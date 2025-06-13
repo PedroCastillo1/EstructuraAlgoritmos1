@@ -952,6 +952,9 @@ def agregar_servicio(servicios_disponibles):
     while True:
             try:
                 precio = int(input("Ingrese el nuevo precio del servicio: "))
+                while precio <= 0:
+                    print("El precio no puede ser negativo. Intente nuevamente.")
+                    precio = int(input("Ingrese el nuevo precio del servicio: "))
                 break
             except ValueError:
                 print("Precio inválido. Ingrese un número.")
@@ -1153,7 +1156,6 @@ def mostrar_menu_servicios(servicios_disponibles, servicios_seleccionados):
 
     # Devuelve las opciones necesarias para que la función principal las utilice
     return servicios_para_mostrar, opcion_eliminar, opcion_finalizar
-
 
 def seleccionar_servicios(servicios_disponibles):
     """
@@ -1363,6 +1365,21 @@ def mostrarCalendario(año, eventos):
         # Imprime una línea en blanco al terminar cada mes.
         print()
 #===================================================================================================================================
+def crearServiciosPredefinidos(servicios_disponibles):
+    """
+    Crea servicios por defecto para el sistema si no hay servicios cargados.
+    Agrega servicios por defecto
+    """
+    servicios_disponibles["Catering"] = {"tipo": "variable", "precio": 5000}
+    servicios_disponibles["Bartender"] = {"tipo": "fija", "precio": 25000}
+    servicios_disponibles["Decoración básica"] = {"tipo": "fija", "precio": 80000}
+    servicios_disponibles["Pack sonido e iluminación"] = {"tipo": "fija", "precio": 80000}
+    servicios_disponibles["DJ"] = {"tipo": "fija", "precio": 50000}
+    servicios_disponibles["Fotógrafo"] = {"tipo": "fija", "precio": 20000}
+
+    guardar_en_json(SERVICIOS, servicios_disponibles)  # Guarda los servicios por defecto en el archivo JSON.
+#===================================================================================================================================
+
 def programaPrincipal(usuarios, calendario, servicios_disponibles):
     """
         Función principal que coordina el funcionamiento del sistema completo.
@@ -1370,10 +1387,12 @@ def programaPrincipal(usuarios, calendario, servicios_disponibles):
         los submenús según el tipo de usuario (admin o usuario común).
     """
     usuarios = cargar_desde_json(USUARIOS) # Carga los usuarios desde el archivo JSON. Sobrescribe la variable local `usuarios`.
-    if len(usuarios) == 0: # Si no se encontraron usuarios cargados...
+    if len(usuarios) == 0: # Si no se encontraron usuarios cargados
         usuarios["admin"] = {"contraseña": "1234", "rol": "admin"} # Se crea un usuario administrador por defecto para asegurar el acceso inicial al sistema.
     calendario = cargar_desde_json("eventos.json") # Carga el calendario de eventos desde archivo JSON.
     servicios_disponibles = cargar_desde_json(SERVICIOS) # Carga los servicios disponibles desde archivo JSON.
+    if len(servicios_disponibles) == 0: # Si no se encontraron servicios cargados
+        crearServiciosPredefinidos(servicios_disponibles) # Se crean servicios por defecto para asegurar que haya al menos uno disponible.
     while True:
         menu_interactivo()
         try:

@@ -6,11 +6,11 @@ SALONES = ["Palermo","Puerto Madero","Nordelta","San Telmo","Recoleta"]
 TURNOS  = ["Mañana","Tarde","Noche"]
 TIPOS_DE_EVENTOS = ["Fiesta de egresados","Casamiento","Cumple de XV","Despedida de soltero","Evento empresarial","Conferencia"]
 ATRIBUTOS_DE_EVENTOS = ["Fecha", "Salon", "Turno", "Cliente", "Tipo de evento", "Cantidad de personas", "Servicios"]
-USUARIOS = "../EstructuraAlgoritmos1/Archivos/usuarios.json"
-EVENTOS = "../EstructuraAlgoritmos1/Archivos/eventos.json"
-SERVICIOS = "../EstructuraAlgoritmos1/Archivos/servicios.json"
-FACTURAS = "../EstructuraAlgoritmos1/Archivos/factura.txt"
-AUDITORIA = "../EstructuraAlgoritmos1/Archivos/auditoria.txt"
+USUARIOS = "usuarios.json"
+EVENTOS = "eventos.json"
+SERVICIOS = "servicios.json"
+FACTURAS = "factura.txt"
+AUDITORIA = "auditoria.txt"
 # Estructura actualizada: diccionario con contraseña y rol
 usuarios = {
     #"admin": {"contraseña": "1234", "rol": "admin"},
@@ -57,7 +57,8 @@ def Interfaz_MenuAdministrador():
     print("|                                   3. Ver usuarios                                                     |")
     print("|                                   4. Buscar usuario                                                   |")
     print("|                                   5. Ver Auditoria                                                    |")
-    print("|                                   6. Cerrar sesión                                                    |")
+    print("|                                   6. Gestionar servicios                                              |")
+    print("|                                   7. Cerrar sesión                                                    |")
     print("=========================================================================================================")
 def menu_interactivo():
     print("=========================================================================================================")
@@ -186,6 +187,38 @@ def interfazValorAModificar():
     print("|                             5. Tipo de evento                                                         |")
     print("|                             6. Cantidad de personas                                                   |")
     print("|                             7. Servicios                                                              |")
+    print("=========================================================================================================")
+    print("|                             0. Cancelar                                                               |")
+    print("=========================================================================================================")
+
+def Interfaz_MenuServicios():
+    print("=========================================================================================================")
+    print("|                                MENÚ DE GESTIÓN DE SERVICIOS                                           |")
+    print("=========================================================================================================")
+    print("|                             1. Agregar servicio                                                       |")
+    print("|                             2. Eliminar servicio                                                      |")
+    print("|                             3. Editar servicio                                                        |")
+    print("=========================================================================================================")
+    print("|                             0. Volver al menú anterior                                                |")
+    print("=========================================================================================================")
+
+def InterfazAtributoDeServicioAModificar():
+    print("=========================================================================================================")
+    print("|                                    SELECCIONE ATRIBUTO A MODIFICAR                                    |")
+    print("=========================================================================================================")
+    print("|                             1. Nombre                                                                 |")
+    print("|                             2. Tipo                                                                   |")
+    print("|                             3. Precio                                                                 |")
+    print("=========================================================================================================")
+    print("|                             0. Cancelar                                                               |")
+    print("=========================================================================================================")
+
+def InterfazTipoServicio():
+    print("=========================================================================================================")
+    print("|                                      SELECCIONE TIPO DE SERVICIO                                      |")
+    print("=========================================================================================================")
+    print("|                             1. Fijo                                                                   |")
+    print("|                             2. Variable                                                               |")
     print("=========================================================================================================")
     print("|                             0. Cancelar                                                               |")
     print("=========================================================================================================")
@@ -478,7 +511,7 @@ def modificar_datos_personales(nombre, usuarios):
     except Exception as e:
         print(f"Error inesperado: {str(e)}")
 #=================================================== ZONA DE MENU ADMIN ===========================================================
-def menu_admin(usuarios):
+def menu_admin(usuarios,servicios_disponibles):
     while True:
         Interfaz_MenuAdministrador()
         try:
@@ -493,7 +526,9 @@ def menu_admin(usuarios):
                 buscar_usuario(usuarios)
             elif opcion == "5": # ---------------- AUDITORIA ----------------------
                 ver_auditoria()
-            elif opcion == "6": # ---------------- CIERRE CUENTA ------------------
+            elif opcion == "6": # ---------------- GESTION SERVICIOS ------------------
+                menu_gestion_servicios(servicios_disponibles)
+            elif opcion == "7": # ---------------- CIERRE CUENTA ------------------
                 print("Cierre de sesión del administrador.")
                 registrar_auditoria("admin", "Cerró sesión")
                 break
@@ -502,6 +537,25 @@ def menu_admin(usuarios):
         except Exception as e:
             print("Error inesperado:", e)
     return usuarios
+#=========================================================================================================
+def menu_gestion_servicios(servicios_disponibles):
+    while True:
+        try:
+            Interfaz_MenuServicios()
+            opcion = input("Seleccione una opción: ").strip()
+            if opcion == "1":
+                agregar_servicio(servicios_disponibles)
+            elif opcion == "2":
+                eliminar_servicio(servicios_disponibles)
+            elif opcion == "3":
+                editar_servicio(servicios_disponibles)
+            elif opcion == "0":
+                print("Saliendo del menú de servicios")
+                break
+            else:
+                print("Opción inválida. Intente nuevamente.")
+        except Exception as e:
+            print("Error inesperado:", e)
 #=================================================== ZONA DE MENU USUARIO ===========================================================
 def menu_usuario(nombre,calendario,usuarios,servicios_disponibles):
     while True:
@@ -877,6 +931,101 @@ def editarEvento(calendario,servicios_disponibles):
     calendario.pop(clave)  # Elimina el evento original del calendario
     calendario[claveNueva] = evento  # Agrega el evento modificado con la nueva clave
     return claveNueva, evento  # Devuelve la nueva clave y el evento modificado
+#=======================================================================================================
+
+def agregar_servicio(servicios_disponibles):
+    nombre = input("Nombre del nuevo servicio: ").strip().title()
+    if nombre in servicios_disponibles:
+        print("Ese servicio ya existe.")
+        return servicios_disponibles
+    opciones_tipo = ["Fija", "Variable"]
+    InterfazTipoServicio()
+    tipo = seleccionar_opciones(opciones_tipo)
+    if tipo is None:
+        print("Operación cancelada.")
+        return servicios_disponibles
+    while True:
+            try:
+                precio = int(input("Ingrese el nuevo precio del servicio: "))
+                break
+            except ValueError:
+                print("Precio inválido. Ingrese un número.")
+
+    servicios_disponibles[nombre] = {"tipo": tipo.lower(), "precio": precio}
+    guardar_en_json(SERVICIOS, servicios_disponibles)
+    print(f"Servicio '{nombre}' agregado correctamente.")
+
+def eliminar_servicio(servicios_disponibles):
+    if not servicios_disponibles:
+        print("No hay servicios registrados.")
+        return servicios_disponibles
+    print("Servicios disponibles para eliminar:")
+    for indice, servicio in enumerate(servicios_disponibles, 1):
+        print(f"{indice}: {servicio} - ${servicios_disponibles[servicio]['precio']} ({servicios_disponibles[servicio]['tipo']})")
+    print("0: Cancelar eliminación")
+    servicio_a_eliminar = seleccionar_opciones(list(servicios_disponibles.keys()))
+    if servicio_a_eliminar is None:
+        print("Operación cancelada.")
+        return servicios_disponibles
+    else:
+        servicios_disponibles.pop(servicio_a_eliminar, None)
+        guardar_en_json(SERVICIOS, servicios_disponibles)
+        print(f"Servicio '{servicio_a_eliminar}' eliminado correctamente.")
+
+def editar_servicio(servicios_disponibles):
+    if not servicios_disponibles:
+        print("No hay servicios registrados.")
+        return servicios_disponibles
+    print("Servicios disponibles para editar:")
+    for indice, servicio in enumerate(servicios_disponibles, 1):
+        print(f"{indice}: {servicio} - ${servicios_disponibles[servicio]['precio']} ({servicios_disponibles[servicio]['tipo']})")
+    print("0: Cancelar edición")
+    servicio_a_editar = seleccionar_opciones(list(servicios_disponibles.keys()))
+    if servicio_a_editar is None:
+        print("Operación cancelada.")
+        return servicios_disponibles
+    InterfazAtributoDeServicioAModificar()
+    opciones_modificar = ["Nombre", "Tipo", "Precio"]
+    opcion_modificar = seleccionar_opciones(opciones_modificar)
+
+    if opcion_modificar is None:
+        print("Operación cancelada.")
+        return servicios_disponibles
+
+    if opcion_modificar == "Nombre":
+        nuevo_nombre = input("Ingrese el nuevo nombre del servicio: ").strip().title()
+        if nuevo_nombre in servicios_disponibles:
+            print("Ese nombre ya existe.")
+            return servicios_disponibles
+        servicios_disponibles[nuevo_nombre] = servicios_disponibles.pop(servicio_a_editar)
+        print(f"Nombre del servicio cambiado a '{nuevo_nombre}'.")
+
+    elif opcion_modificar == "Tipo":
+        opciones_tipo = ["Fija", "Variable"]
+        InterfazTipoServicio()
+        nuevo_tipo = seleccionar_opciones(opciones_tipo)
+        if nuevo_tipo is None:
+            print("Operación cancelada.")
+            return servicios_disponibles
+        servicios_disponibles[servicio_a_editar]["tipo"] = nuevo_tipo.lower()
+        print(f"Tipo del servicio cambiado a '{nuevo_tipo}'.")
+
+    elif opcion_modificar == "Precio":
+        while True:
+            try:
+                nuevo_precio = int(input("Ingrese el nuevo precio del servicio: "))
+                servicios_disponibles[servicio_a_editar]["precio"] = nuevo_precio
+                print(f"Precio del servicio cambiado a ${nuevo_precio}.")
+                break
+            except ValueError:
+                print("Precio inválido. Ingrese un número.")
+    else:
+        print("Opción no válida.")
+        return servicios_disponibles
+    # Guarda los cambios en el archivo JSON
+    guardar_en_json(SERVICIOS, servicios_disponibles)
+
+#===================================================================================================================================
 #===================================================================================================================================
 def seleccionar_fecha_salon_turno(calendario):
     """
@@ -1218,7 +1367,7 @@ def programaPrincipal(usuarios, calendario, servicios_disponibles):
                 usuario_actual = iniciar_sesion(usuarios)
                 if usuario_actual:
                     if usuarios[usuario_actual]["rol"] == "admin": # Si el usuario tiene rol de administrador
-                        usuarios = menu_admin(usuarios)
+                        usuarios = menu_admin(usuarios,servicios_disponibles)
                     else: # usuario común.
                         menu_usuario(usuario_actual, calendario, usuarios, servicios_disponibles)
             elif entrada == "-1": # ---------------- SALIR SESION -------------
@@ -1226,7 +1375,8 @@ def programaPrincipal(usuarios, calendario, servicios_disponibles):
                 break
             else:
                 print("Opción inválida.")
-        except:
+        except Exception as e:
+            print(f"Error inesperado: {e}")
             print("Error inesperado en el menú principal.")
 
 ## PROGRAMA PRINCIPAL ##

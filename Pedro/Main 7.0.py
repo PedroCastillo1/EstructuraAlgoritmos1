@@ -5,7 +5,7 @@ import json
 SALONES = ["Palermo","Puerto Madero","Nordelta","San Telmo","Recoleta"]
 TURNOS  = ["Mañana","Tarde","Noche"]
 TIPOS_DE_EVENTOS = ["Fiesta de egresados","Casamiento","Cumple de XV","Despedida de soltero","Evento empresarial","Conferencia"]
-VALORES_DE_EVENTOS = ["Fecha", "Salon", "Turno", "Cliente", "Tipo de evento", "Cantidad de personas", "Servicios"]
+ATRIBUTOS_DE_EVENTOS = ["Fecha", "Salon", "Turno", "Cliente", "Tipo de evento", "Cantidad de personas", "Servicios"]
 USUARIOS = "usuarios.json"
 EVENTOS = "eventos.json"
 SERVICIOS = "servicios.json"
@@ -92,7 +92,6 @@ def Interfaz_EliminarEvento():
     print("=========================================================================================================")
     print("|                                         ELIMINAR EVENTO                                               |")
     print("=========================================================================================================")
-
 def Interfaz_MenuEvento():
     print("=========================================================================================================")
     print("|                                      GESTOR DE EVENTOS                                                |")
@@ -177,7 +176,7 @@ def interfaz_tipo_turno():
 
 def interfazValorAModificar():
     print("=========================================================================================================")
-    print("|                                      SELECCIONE VALOR A MODIFICAR                                       |")
+    print("|                                      SELECCIONE VALOR A MODIFICAR                                     |")
     print("=========================================================================================================")
     print("|                             1. Fecha                                                                  |")
     print("|                             2. Salon                                                                  |")
@@ -842,7 +841,7 @@ def editarEvento(calendario,servicios_disponibles):
     claveNueva = (fechaNueva, salonNuevo, turnoNuevo)  # Crea la clave única para acceder al evento en el calendario
     evento = calendario[clave]  # Obtiene el evento correspondiente a la clave seleccionada
     interfazValorAModificar() 
-    valorAModificar = seleccionar_opciones(VALORES_DE_EVENTOS)
+    valorAModificar = seleccionar_opciones(ATRIBUTOS_DE_EVENTOS)
     while valorAModificar is not None:
         if valorAModificar == "Cliente":
             nuevo_cliente = input("Ingrese el nuevo nombre del cliente: ").strip().title()
@@ -942,7 +941,7 @@ def editarEvento(calendario,servicios_disponibles):
             print("Opción no válida.")
             return
         interfazValorAModificar()
-        valorAModificar = seleccionar_opciones(VALORES_DE_EVENTOS)
+        valorAModificar = seleccionar_opciones(ATRIBUTOS_DE_EVENTOS)
     
     calendario.pop(clave)  # Elimina el evento original del calendario
     calendario[claveNueva] = evento  # Agrega el evento modificado con la nueva clave

@@ -94,7 +94,10 @@ def interfaz_EliminarEvento():
     print("=========================================================================================================")
     print("|                                         ELIMINAR EVENTO                                               |")
     print("=========================================================================================================")
-
+def interfaz_mostrar_servicios():
+    print("=========================================================================================================")
+    print("|                                         VER SERVICIOS DISPONIBLES                                     |")
+    print("=========================================================================================================")
 def interfaz_MenuEvento():
     print("=========================================================================================================")
     print("|                                      GESTOR DE EVENTOS                                                |")
@@ -145,7 +148,7 @@ def interfaz_tipo_evento():
     print("=========================================================================================================")
     print("|                             1. Fiesta de egresados                                                    |")
     print("|                             2. Casamiento                                                             |")
-    print("|                             3. Cumple de XV                                                           |")
+    print("|                             3. Cumpleaños                                                           |")
     print("|                             4. Despedida de soltero                                                   |")
     print("|                             5. Evento Empresarial                                                     |")
     print("|                             6. Conferencia                                                            |")
@@ -195,9 +198,10 @@ def interfaz_MenuServicios():
     print("=========================================================================================================")
     print("|                                MENÚ DE GESTIÓN DE SERVICIOS                                           |")
     print("=========================================================================================================")
-    print("|                             1. Agregar servicio                                                       |")
-    print("|                             2. Eliminar servicio                                                      |")
-    print("|                             3. Editar servicio                                                        |")
+    print("|                             1. Ver servicios disponibles                                              |")
+    print("|                             2. Agregar servicio                                                       |")
+    print("|                             3. Eliminar servicio                                                      |")
+    print("|                             4. Editar servicio                                                        |")
     print("=========================================================================================================")
     print("|                             0. Volver al menú anterior                                                |")
     print("=========================================================================================================")
@@ -283,11 +287,11 @@ def crearServiciosPredefinidos(servicios_disponibles):
     Agrega servicios por defecto
     """
     servicios_disponibles["Catering"] = {"tipo": "variable", "precio": 5000}
-    servicios_disponibles["Bartender"] = {"tipo": "fija", "precio": 25000}
-    servicios_disponibles["Decoración básica"] = {"tipo": "fija", "precio": 80000}
-    servicios_disponibles["Pack sonido e iluminación"] = {"tipo": "fija", "precio": 80000}
-    servicios_disponibles["DJ"] = {"tipo": "fija", "precio": 50000}
-    servicios_disponibles["Fotógrafo"] = {"tipo": "fija", "precio": 20000}
+    servicios_disponibles["Bartender"] = {"tipo": "fijo", "precio": 25000}
+    servicios_disponibles["Decoración básica"] = {"tipo": "fijo", "precio": 80000}
+    servicios_disponibles["Pack sonido e iluminación"] = {"tipo": "fijo", "precio": 80000}
+    servicios_disponibles["DJ"] = {"tipo": "fijo", "precio": 50000}
+    servicios_disponibles["Fotógrafo"] = {"tipo": "fijo", "precio": 20000}
 
     guardar_en_json(SERVICIOS, servicios_disponibles)  # Guarda los servicios por defecto en el archivo JSON.
 #===================================================================================================================================
@@ -557,11 +561,13 @@ def menu_gestion_servicios(servicios_disponibles):
         try:
             interfaz_MenuServicios()
             opcion = input("Seleccione una opción: ").strip()
-            if opcion == "1": # ------------------ CREAR SERVICIO -------------------
+            if opcion == "1": # ------------------ MOSTRAR SERVICIOS -------------------
+                mostrar_servicios(servicios_disponibles)
+            elif opcion == "2": # ------------------ AGREGAR SERVICIO -------------------
                 agregar_servicio(servicios_disponibles)
-            elif opcion == "2": # ---------------- ELIMINAR SERVICIO ----------------
+            elif opcion == "3": # ---------------- ELIMINAR SERVICIO ----------------
                 eliminar_servicio(servicios_disponibles)
-            elif opcion == "3": # ---------------- EDITAR SERVICIO ------------------    
+            elif opcion == "4": # ---------------- EDITAR SERVICIO ------------------    
                 editar_servicio(servicios_disponibles)
             elif opcion == "0": # ---------------- CIERRE SERVICIOS -----------------
                 print("Saliendo del menú de servicios")
@@ -592,7 +598,7 @@ def menu_usuario(nombre,calendario,usuarios,servicios_disponibles):
 def menu_eventos(usuario,calendario,servicios_disponibles):
     while True:
         interfaz_MenuEvento()
-        opcion = input("Seleccione una opción (1-6): ").strip()
+        opcion = input("Seleccione una opción (1-7): ").strip()
         if opcion == "1": # ---------------- CREAR UN EVENTO ---------------------
             agregar_evento(usuario, calendario, servicios_disponibles)
         elif opcion == "2": # ---------------- VER TODOS LOS EVENTOS -------------
@@ -679,7 +685,7 @@ def agregar_evento(usuario, calendario, servicios_disponibles):
 
         # 8) Construcción del diccionario de servicios personalizados para el evento
         servicios_evento = servicios_disponibles.copy()  # Se hace una copia para no modificar el original
-        for servicio, precio in servicios_evento.items():  # Recorre los servicios
+        for servicio, precio in servicios_evento.items(): 
             if precio["tipo"] == "variable":  # Si el servicio es variable (depende de personas)
                 servicios_evento[servicio] = precio["precio"] * cant  # Calcula el total por cantidad
             else:
@@ -892,8 +898,12 @@ def editarEvento(calendario, servicios_disponibles, usuario):
                 else:
                     servicios_evento[servicio] = precio["precio"]
             nuevos_servicios, nuevos_precios = seleccionar_servicios(servicios_evento)
-            eventoNuevo["servicios"] = nuevos_servicios
-            eventoNuevo["precios"] = nuevos_precios
+            subtotal = sum(nuevos_precios)  # Suma los precios para obtener el total sin limpieza
+            limpieza = subtotal * 0.05  # Calcula un 5% extra por limpieza postevento
+            nuevos_servicios.append("Limpieza postevento")  # Se agrega este servicio a la lista
+            nuevos_precios.append(limpieza)  # Se agrega el costo de limpieza
+            eventoNuevo["servicios"] = nuevos_servicios # Actualiza la lista de servicios
+            eventoNuevo["precios"] = nuevos_precios # Actualiza la lista de precios
             print("Servicios modificados correctamente.")
 
         elif valorAModificar == "Fecha":
@@ -965,7 +975,7 @@ def agregar_servicio(servicios_disponibles):
         print("Ese servicio ya existe.")
         return servicios_disponibles 
     
-    opciones_tipo = ["Fija", "Variable"] # Define las opciones disponibles para el tipo de servicio
+    opciones_tipo = ["Fijo", "Variable"] # Define las opciones disponibles para el tipo de servicio
     interfazTipoServicio()
     tipo = seleccionar_opciones(opciones_tipo)
     if tipo is None:
@@ -984,6 +994,31 @@ def agregar_servicio(servicios_disponibles):
     guardar_en_json(SERVICIOS, servicios_disponibles) # Guarda el diccionario actualizado en el archivo JSON correspondiente
     registrar_auditoria("admin", f"Agregó el servicio '{nombre}'")
     print(f"Servicio '{nombre}' agregado correctamente.")
+#===================================================================================================================================
+def mostrar_servicios(servicios_disponibles):
+    """
+    Muestra todos los servicios disponibles en el sistema.
+    Si no hay servicios, informa al usuario.
+    """
+    try:
+        interfaz_mostrar_servicios()  # Muestra la interfaz de servicios
+        if not servicios_disponibles:  # Verifica si el diccionario de servicios está vacío
+            print("No hay servicios registrados.")
+        else: # Si hay servicios, los muestra en una tabla
+            print("┌────────────────────────────────┬────────────┬────────────┐")
+            print("│          Servicio              │   Precio   │   Tipo     │")
+            print("├────────────────────────────────┼────────────┼────────────┤")
+            for servicio, datos in servicios_disponibles.items(): # Recorre cada servicio en el diccionario
+                # Muestra el nombre del servicio, su precio y tipo (fijo o variable) en formato de tabla
+                nombre = servicio
+                precio = datos['precio']
+                tipo = datos['tipo']
+                print(f"│ {nombre:<30} │ ${precio:<9.2f} │ {tipo:<10} │")
+            print("└────────────────────────────────┴────────────┴────────────┘")
+        registrar_auditoria("admin", "Mostró la lista de servicios")  # Registra la acción en el archivo de auditoría
+    except Exception as e: # Captura cualquier error al mostrar los servicios
+        print("Error al mostrar la interfaz de servicios:", e)
+
 #===================================================================================================================================
 def eliminar_servicio(servicios_disponibles):
     if not servicios_disponibles: # Verifica si el diccionario de servicios está vacío
@@ -1052,7 +1087,7 @@ def editar_servicio(servicios_disponibles):
 
             #------------------- CAMBIO DE TIPO DEL SERVICIO -------------------
             elif opcion_modificar == "Tipo":
-                opciones_tipo = ["Fija", "Variable"]
+                opciones_tipo = ["Fijo", "Variable"]
                 interfazTipoServicio()
                 nuevo_tipo = seleccionar_opciones(opciones_tipo)
                 if nuevo_tipo is None:
@@ -1249,7 +1284,7 @@ def seleccionar_servicios(servicios_disponibles):
                 print(f"{indice}. {servicio}")
 
             # Pide el número del servicio a eliminar
-            entrada_eliminar = input("Número del servicio a eliminar: ").strip()
+            entrada_eliminar = input("Número del servicio a eliminar: ")
 
             # Si es un número válido, lo elimina
             if entrada_eliminar.isdigit():

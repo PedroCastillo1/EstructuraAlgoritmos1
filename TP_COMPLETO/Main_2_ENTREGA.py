@@ -630,7 +630,7 @@ def agregar_evento(usuario, calendario, servicios_disponibles):
     Permite al usuario crear un nuevo evento y lo guarda en el diccionario.
     """
     try:
-        # 1) Interfaz para ingresar nombre del cliente
+        # 1) Ingresar nombre del cliente
         interfaz_CrearEvento()
         cliente = input("Ingrese su nombre: ").strip().title()  # Pide el nombre, lo limpia y capitaliza
         

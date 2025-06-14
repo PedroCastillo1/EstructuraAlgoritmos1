@@ -1281,17 +1281,24 @@ def seleccionar_servicios(servicios_disponibles):
 #===================================================================================================================================
 def seleccionar_opciones(lista_de_opciones):
     """
-        Esta función presenta una lista de opciones numeradas al usuario
-        y permite seleccionar una de ellas mediante su número.
-        Retorna la opción elegida o None si se cancela.
+    Versión recursiva que presenta una lista de opciones y devuelve la elegida.
+    Vuelve a llamarse a sí misma si la opción es inválida.
     """
-    while True:
-        opcion = input(f"Seleccione una opción (1-{len(lista_de_opciones)} o 0 para cancelar): ").strip()
-        if opcion == "0":
-            return None
-        if opcion.isdigit() and 1 <= int(opcion) <= len(lista_de_opciones): # Verifica si el valor ingresado es un número y está dentro del rango de opciones disponibles.
-            return lista_de_opciones[int(opcion) - 1] # Retorna la opción seleccionada (ajustando el índice ya que las listas comienzan en 0).
+    opcion = input(f"Seleccione una opción (1-{len(lista_de_opciones)} o 0 para cancelar): ").strip()
+
+    # ---- CASO BASE 1: El usuario cancela la operación ----
+    if opcion == "0":
+        return None
+    
+    # ---- CASO BASE 2: El usuario ingresa una opción válida ----
+    if opcion.isdigit() and 1 <= int(opcion) <= len(lista_de_opciones):
+        return lista_de_opciones[int(opcion) - 1]
+    
+    # ---- PASO RECURSIVO: La opción no es válida ----
+    else:
         print("Opción inválida. Intente nuevamente.")
+        # La función se llama a sí misma para repetir la pregunta.
+        return seleccionar_opciones(lista_de_opciones)
 #===================================================================================================================================
 # Validación y calendario
 def esBisiesto(año):

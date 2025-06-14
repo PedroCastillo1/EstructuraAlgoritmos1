@@ -973,10 +973,10 @@ def agregar_servicio(servicios_disponibles):
         return servicios_disponibles
     while True:
         try:
-            precio = int(input("Ingrese el nuevo precio del servicio: "))
+            precio = float(input("Ingrese el nuevo precio del servicio: "))
             while precio <= 0:
                 print("El precio no puede ser negativo. Intente nuevamente.")
-                precio = int(input("Ingrese el nuevo precio del servicio: "))
+                precio = float(input("Ingrese el nuevo precio del servicio: "))
             break
         except ValueError:
             print("Precio inválido. Ingrese un número.")
@@ -1066,7 +1066,7 @@ def editar_servicio(servicios_disponibles):
             elif opcion_modificar == "Precio":
                 while True:
                     try:
-                        nuevo_precio = int(input("Ingrese el nuevo precio del servicio: "))
+                        nuevo_precio = float(input("Ingrese el nuevo precio del servicio: "))
                         # Asigna el nuevo precio
                         servicios_disponibles[servicio_a_editar]["precio"] = nuevo_precio
                         print(f"Precio del servicio cambiado a ${nuevo_precio}.")

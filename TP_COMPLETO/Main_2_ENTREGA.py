@@ -4,7 +4,7 @@ import json
 # — Constantes —
 SALONES = ["Palermo","Puerto Madero","Nordelta","San Telmo","Recoleta"]
 TURNOS  = ["Mañana","Tarde","Noche"]
-TIPOS_DE_EVENTOS = ["Fiesta de egresados","Casamiento","Cumple de XV","Despedida de soltero","Evento empresarial","Conferencia"]
+TIPOS_DE_EVENTOS = ["Fiesta de egresados","Casamiento","Cumpleaños","Despedida de soltero","Evento empresarial","Conferencia"]
 ATRIBUTOS_DE_EVENTOS = ["Fecha", "Salon", "Turno", "Cliente", "Tipo de evento", "Cantidad de personas", "Servicios"]
 USUARIOS = "usuarios.json"
 EVENTOS = "eventos.json"
